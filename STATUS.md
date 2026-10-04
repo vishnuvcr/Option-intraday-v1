@@ -6,15 +6,15 @@
 
 ## Current phase
 
-**Phase 3 — Contract/PIT validation: developer validation passed; tester gate pending**
+**Phase 4 — Engine/cost model: implementation starting after P3 pass**
 
 | Phase | Status |
 |---|---|
 | 0 Governance | ✅ passed |
 | 1 Strategy freeze | ✅ tester passed |
 | 2 Data acquisition | ✅ tester passed |
-| 3 Data validation | 🟡 developer pass; tester review pending |
-| 4 Engine/cost model | ⚪ pending |
+| 3 Data validation | ✅ tester passed |
+| 4 Engine/cost model | 🟡 implementation starting |
 | 5 Primary backtest | ⚪ pending |
 | 6 Robustness | ⚪ pending |
 | 7 Independent tester | ⚪ pending |
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys. The first runs exposed a manifest-field mismatch, an over-strict 346-minute completeness gate, and incorrect historical lot-size cutoffs. All three have been remediated. Workflow run 23 passed with 301 eligible trade dates and zero global duplicate-key groups. Independent tester review is the gate to Phase 4.
+P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys. The first runs exposed a manifest-field mismatch, an over-strict 346-minute completeness gate, and incorrect historical lot-size cutoffs. All three have been remediated. Workflow run 23 passed with 301 eligible trade dates and zero global duplicate-key groups. Independent tester passed P3 with a no-forward-fill condition. Phase 4 is now authorized.
 
 ## Key known limitation
 
