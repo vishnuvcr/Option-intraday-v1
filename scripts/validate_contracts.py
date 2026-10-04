@@ -57,6 +57,7 @@ def main() -> None:
     con.execute("SET TimeZone='Asia/Kolkata'")
     con.execute("PRAGMA threads=4")
     con.execute("PRAGMA enable_progress_bar=false")
+    con.execute("SET TimeZone='Asia/Kolkata'")
     files_sql = sql_file_list(option_paths)
     con.execute(
         f"CREATE OR REPLACE VIEW options AS "
@@ -133,7 +134,7 @@ def main() -> None:
         JOIN spot_0930 s
           ON CAST(o.date AS DATE) = CAST(s.trade_date AS DATE)
         WHERE CAST(o.date AS DATE) BETWEEN DATE '2024-10-01' AND DATE '2025-12-31'
-          AND CAST(o.timestamp AS TIME) = TIME '09:30:00'
+          AND CAST(o.timestamp AT TIME ZONE 'Asia/Kolkata' AS TIME) = TIME '09:30:00'
           AND (
               (CAST(o.expiry AS DATE) = m.current_expiry AND o.option_type = 'CE')
               OR
@@ -271,7 +272,7 @@ def main() -> None:
      AND CAST(o.strike AS DOUBLE) = CAST(a.strike AS DOUBLE)
      AND o.option_type = a.option_type
      AND CAST(o.timestamp AS DATE) = CAST(a.trade_date AS DATE)
-     AND CAST(o.timestamp AS TIME) BETWEEN TIME '09:30:00' AND TIME '15:15:00'
+     AND CAST(o.timestamp AT TIME ZONE 'Asia/Kolkata' AS TIME) BETWEEN TIME '09:30:00' AND TIME '15:15:00'
     GROUP BY a.trade_date, a.expiry, a.strike, a.option_type
     """
     completeness = con.execute(completeness_sql).df()
