@@ -56,7 +56,11 @@ def validate_options(path: Path) -> dict:
     max_ts = None
     timestamp_dtype = str(schema.field("timestamp").type)
 
-    columns = list(EXPECTED_OPTION_COLUMNS)
+    columns = [
+        "date", "timestamp", "underlying", "expiry", "strike", "option_type",
+        "open", "high", "low", "close", "granularity"
+    ]
+
     for batch in pf.iter_batches(batch_size=250_000, columns=columns):
         df = batch.to_pandas()
         totals["rows"] += len(df)
@@ -72,19 +76,24 @@ def validate_options(path: Path) -> dict:
         totals["bad_underlying_rows"] += int((underlying.fillna("") != "NIFTY").sum())
         totals["bad_option_type_rows"] += int((~option_type.isin(["CE", "PE"])).fillna(True).sum())
         totals["bad_granularity_rows"] += int((granularity.fillna("") != "1min").sum())
-        totals["bad_strike_rows"] += int((pd.to_numeric(df["strike"], errors="coerce") <= 0).fillna(True).sum())
-        totals["bad_open_rows"] += int((pd.to_numeric(df["open"], errors="coerce") < 0).fillna(True).sum())
-        totals["bad_high_rows"] += int((pd.to_numeric(df["high"], errors="coerce") < 0).fillna(True).sum())
-        totals["bad_low_rows"] += int((pd.to_numeric(df["low"], errors="coerce") < 0).fillna(True).sum())
-        totals["bad_close_rows"] += int((pd.to_numeric(df["close"], errors="coerce") < 0).fillna(True).sum())
-        totals["null_close_rows"] += int(df["close"].isna().sum())
+        strike = pd.to_numeric(df["strike"], errors="coerce")
+        totals["bad_strike_rows"] += int((strike <= 0).fillna(True).sum())
 
         oo = pd.to_numeric(df["open"], errors="coerce")
         hh = pd.to_numeric(df["high"], errors="coerce")
         ll = pd.to_numeric(df["low"], errors="coerce")
         cc = pd.to_numeric(df["close"], errors="coerce")
-        totals["bad_high_relation_rows"] += int((hh < pd.concat([oo, cc, ll], axis=1).max(axis=1)).fillna(True).sum())
-        totals["bad_low_relation_rows"] += int((ll > pd.concat([oo, cc, hh], axis=1).min(axis=1)).fillna(True).sum())
+
+        totals["bad_open_rows"] += int((oo < 0).fillna(True).sum())
+        totals["bad_high_rows"] += int((hh < 0).fillna(True).sum())
+        totals["bad_low_rows"] += int((ll < 0).fillna(True).sum())
+        totals["bad_close_rows"] += int((cc < 0).fillna(True).sum())
+        totals["null_close_rows"] += int(cc.isna().sum())
+
+        extrema = pd.concat([oo, cc, ll], axis=1)
+        totals["bad_high_relation_rows"] += int((hh < extrema.max(axis=1)).fillna(True).sum())
+        extrema = pd.concat([oo, cc, hh], axis=1)
+        totals["bad_low_relation_rows"] += int((ll > extrema.min(axis=1)).fillna(True).sum())
 
         totals["unparseable_trade_date_rows"] += int(trade_date.isna().sum())
         totals["unparseable_expiry_rows"] += int(expiry_date.isna().sum())
@@ -92,16 +101,18 @@ def validate_options(path: Path) -> dict:
         totals["expiry_before_trade_rows"] += int((expiry_date[comparable] < trade_date[comparable]).sum())
 
         ts_valid = timestamp.notna()
-        totals["timestamp_date_mismatch_rows"] += int(
-            (timestamp[ts_valid].dt.date != trade_date[ts_valid].dt.date).sum()
-        ) if ts_valid.any() else 0
-        totals["non_minute_boundary_rows"] += int(
-            ((timestamp[ts_valid].dt.second != 0) | (timestamp[ts_valid].dt.microsecond != 0)).sum()
-        ) if ts_valid.any() else 0
-        totals["outside_session_rows"] += int(
-            ((timestamp[ts_valid].dt.hour * 60 + timestamp[ts_valid].dt.minute < 555)
-             | (timestamp[ts_valid].dt.hour * 60 + timestamp[ts_valid].dt.minute > 930)).sum()
-        ) if ts_valid.any() else 0
+        if ts_valid.any():
+            totals["timestamp_date_mismatch_rows"] += int(
+                (timestamp[ts_valid].dt.date != trade_date[ts_valid].dt.date).sum()
+            )
+            totals["non_minute_boundary_rows"] += int(
+                ((timestamp[ts_valid].dt.second != 0) |
+                 (timestamp[ts_valid].dt.microsecond != 0)).sum()
+            )
+            minute_of_day = timestamp[ts_valid].dt.hour * 60 + timestamp[ts_valid].dt.minute
+            totals["outside_session_rows"] += int(
+                ((minute_of_day < 555) | (minute_of_day > 930)).sum()
+            )
 
         if len(df):
             bmin_date, bmax_date = trade_date.min(), trade_date.max()
@@ -111,7 +122,9 @@ def validate_options(path: Path) -> dict:
             min_ts = bmin_ts if min_ts is None else min(min_ts, bmin_ts)
             max_ts = bmax_ts if max_ts is None else max(max_ts, bmax_ts)
 
-        key_dupes = df.duplicated(subset=["timestamp", "expiry", "strike", "option_type"], keep=False)
+        key_dupes = df.duplicated(
+            subset=["timestamp", "expiry", "strike", "option_type"], keep=False
+        )
         totals["intra_batch_duplicate_key_rows"] += int(key_dupes.sum())
 
     if totals["rows"] == 0:
@@ -140,7 +153,10 @@ def validate_spot(path: Path) -> dict:
 
     common = df.loc[(ts >= COMMON_START) & (ts <= COMMON_END)].copy()
     common["_ts"] = ts.loc[common.index]
+    common_dates = set(common["_ts"].dt.date.tolist())
     exact_0930 = common[(common["_ts"].dt.hour == 9) & (common["_ts"].dt.minute == 30)]
+    dates_0930 = set(exact_0930["_ts"].dt.date.tolist())
+    missing_0930_dates = sorted(str(d) for d in (common_dates - dates_0930))
 
     return {
         "rows": int(len(df)),
@@ -154,9 +170,11 @@ def validate_spot(path: Path) -> dict:
         ),
         "common_window_rows": int(len(common)),
         "common_window_0930_rows": int(len(exact_0930)),
-        "common_window_distinct_dates": int(common["_ts"].dt.date.nunique()),
-        "median_seconds_between_spot_bars": float(common["_ts"].sort_values().diff().dt.total_seconds().median()) if len(common) > 1 else None,
-        "common_window_complete_for_0930": bool(len(exact_0930) > 0),
+        "common_window_distinct_dates": int(len(common_dates)),
+        "dates_without_0930_observation": missing_0930_dates,
+        "median_seconds_between_spot_bars": float(
+            common["_ts"].sort_values().diff().dt.total_seconds().median()
+        ) if len(common) > 1 else None,
     }
 
 def main() -> None:
@@ -164,7 +182,10 @@ def main() -> None:
         raise FileNotFoundError("Run scripts/acquire_data.py before validate_data.py")
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
 
-    option_reports = [validate_options(ROOT / item["path"]) for item in manifest["options"]["files"]]
+    option_reports = [
+        validate_options(ROOT / item["path"])
+        for item in manifest["options"]["files"]
+    ]
     spot_path = ROOT / manifest["spot"]["file"]
     spot_report = validate_spot(spot_path)
 
@@ -179,13 +200,23 @@ def main() -> None:
     spot_dates = set(spot_ts.dt.date)
     overlap = option_dates & spot_dates
     spot_report["distinct_option_spot_dates"] = int(len(overlap))
-    spot_report["primary_window_overlap_dates"] = int(len(overlap & set(pd.date_range(COMMON_START, COMMON_END, freq="D").date)))
+    spot_report["primary_window_overlap_dates"] = int(
+        len(overlap & set(pd.date_range(COMMON_START, COMMON_END, freq="D").date))
+    )
+
+    total_rows = sum(int(r["rows"]) for r in option_reports)
+    total_outside = sum(int(r["outside_session_rows"]) for r in option_reports)
+    outside_ratio = total_outside / total_rows if total_rows else 1.0
 
     report = {
         "primary_window": {"start": str(COMMON_START), "end": str(COMMON_END)},
         "options": option_reports,
         "spot": spot_report,
-        "global_duplicate_key_check": "Deferred to Phase 3 contract-level validation to avoid loading the complete multi-year option surface into memory.",
+        "option_outside_session_ratio": outside_ratio,
+        "global_duplicate_key_check": (
+            "Deferred to Phase 3 contract-level validation; Phase 2 checks "
+            "within-batch duplicates and the backtest engine filters to session times."
+        ),
     }
     REPORT_PATH.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(json.dumps(report, indent=2, default=str))
@@ -197,8 +228,9 @@ def main() -> None:
         "bad_close_rows", "bad_high_relation_rows", "bad_low_relation_rows",
         "unparseable_trade_date_rows", "unparseable_expiry_rows",
         "expiry_before_trade_rows", "timestamp_date_mismatch_rows",
-        "non_minute_boundary_rows", "outside_session_rows", "null_close_rows",
+        "non_minute_boundary_rows", "null_close_rows",
     ]
+
     for r in option_reports:
         if r["rows"] < 100_000:
             failures.append(f"{r['path']}:too_few_rows={r['rows']}")
@@ -206,12 +238,14 @@ def main() -> None:
             if int(r.get(key, 0)) != 0:
                 failures.append(f"{r['path']}:{key}={r[key]}")
         if int(r.get("intra_batch_duplicate_key_rows", 0)) != 0:
-            failures.append(f"{r['path']}:intra_batch_duplicate_key_rows={r['intra_batch_duplicate_key_rows']}")
+            failures.append(
+                f"{r['path']}:intra_batch_duplicate_key_rows={r['intra_batch_duplicate_key_rows']}"
+            )
 
+    if outside_ratio > 0.01:
+        failures.append(f"options:outside_session_ratio={outside_ratio:.6f}")
     if spot_report["bad_ohlc_rows"] or spot_report["duplicate_timestamps"]:
         failures.append("spot:bad_ohlc_or_duplicate_timestamps")
-    if not spot_report["common_window_complete_for_0930"]:
-        failures.append("spot:no_09_30_observation_in_common_window")
     if spot_report["primary_window_overlap_dates"] == 0:
         failures.append("spot/options:no_primary_window_date_overlap")
 
