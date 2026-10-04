@@ -108,3 +108,9 @@ def test_point_in_time_spot_tie_break_has_no_future_lookahead():
 def test_zero_price_sell_is_floored_at_zero():
     price, _ = fill_cost(0.5, "SELL", 25)
     assert price == 0.0
+
+
+def test_realized_roll_is_already_in_option_points():
+    legs={"ce":{"raw_entry":60.0},"pe":{"raw_entry":60.0}}
+    marks={"ce":100.0,"pe":80.0}
+    assert short_pnl_points(20.0, legs, marks) == -60.0
