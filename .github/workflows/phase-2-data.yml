@@ -3,7 +3,7 @@ name: Phase 2 data acquisition and validation
 on:
   push:
     branches:
-      - developer/phase-1-exact-strategy
+      - developer/phase-2-data
   workflow_dispatch:
 
 permissions:
@@ -32,13 +32,13 @@ jobs:
           path: |
             data/cache/hf_options
             data/cache/spot
-          key: option-intraday-data-v1-\${{ runner.os }}-\${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
+          key: option-intraday-data-v1-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
           restore-keys: |
-            option-intraday-data-v1-\${{ runner.os }}-
+            option-intraday-data-v1-${{ runner.os }}-
 
       - name: Acquire public datasets
         env:
-          HF_TOKEN: \${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python scripts/acquire_data.py
 
       - name: Validate datasets
