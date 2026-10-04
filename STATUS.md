@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 2 — Data acquisition & validation: validator remediated; rerun pending**
+**Phase 2 — Data acquisition & validation: 2024-2025 sample frozen; rerun pending**
 
 | Phase | Status |
 |---|---|
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. A source-coverage gap and a fixed-offset timezone validator defect were both remediated. The corrected workflow must complete successfully and pass independent re-audit before Phase 3.
+P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. A source-coverage gap and two validator compatibility defects were remediated. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. The corrected workflow must complete successfully and pass independent re-audit before Phase 3.
 
 ## Key known limitation
 
