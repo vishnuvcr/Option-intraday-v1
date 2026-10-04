@@ -19,6 +19,7 @@ MANIFEST = CACHE / "acquisition_manifest.json"
 
 HF_REPO = "rissin/nse-options-intraday"
 HF_YEARS = ["2024", "2025", "2026"]
+HF_REVISION = "78b1c5468255d18cf492984bfe6fe4e3ac874d7c"
 SPOT_RELEASE_URL = "https://github.com/voletiramu/nse-fno-1min-data/releases/download/indices-v1.0.0/nifty_indices_5yr.zip"
 EXPECTED_SPOT_SHA256 = "0c1f3de848a4e8c05e233c195685e7ae560d56d08df8baba8b2ffcfac699d3f8"
 
@@ -60,6 +61,7 @@ def download_options() -> list[Path]:
         repo_id=HF_REPO,
         repo_type="dataset",
         allow_patterns=[f"upstox_intraday/NIFTY/NIFTY_{y}.parquet" for y in HF_YEARS],
+        revision=HF_REVISION,
         local_dir=str(HF_ROOT),
         token=token,
     )
@@ -77,7 +79,7 @@ def main() -> None:
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "options": {
             "repo_id": HF_REPO,
-            "revision": "main",
+            "revision": HF_REVISION,
             "files": [{"path": str(p.relative_to(ROOT)), "sha256": sha256(p), "bytes": p.stat().st_size} for p in option_paths],
         },
         "spot": {
