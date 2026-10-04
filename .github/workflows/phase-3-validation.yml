@@ -36,11 +36,17 @@ jobs:
           path: |
             data/cache/hf_options
             data/cache/spot
-          key: option-intraday-data-v1-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
+          key: option-intraday-phase3-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
           restore-keys: |
             option-intraday-data-v1-${{ runner.os }}-
 
-      - name: Assert cached source data exists
+      - name: Acquire source data if Phase 3 cache is empty
+        if: ${{ hashFiles('data/cache/hf_options/upstox_intraday/NIFTY/NIFTY_2024.parquet') == '' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/acquire_data.py
+
+      - name: Assert source data exists
         run: |
           test -f data/cache/hf_options/upstox_intraday/NIFTY/NIFTY_2024.parquet
           test -f data/cache/hf_options/upstox_intraday/NIFTY/NIFTY_2025.parquet
