@@ -6,13 +6,13 @@
 **Pinned dataset revision:** 78b1c5468255d18cf492984bfe6fe4e3ac874d7c  
 **Use:** 1-minute NIFTY option OHLC/volume history.
 
-The pinned snapshot is used as a **composite source** because its Upstox track contains NIFTY 2024 and 2025 partitions, while its 2026 NIFTY partition is under the dataset's Kotak live track. This was discovered during automated acquisition and is recorded as a source-coverage finding, not silently substituted.
+The pinned snapshot provides the validated primary sample through 2025. Its 2026 NIFTY Kotak partition exists but was only 9,344 bytes in the acquisition manifest and is not included in the primary sample because completeness has not been established.
 
-| Sample period | Dataset path | Source track |
-|---|---|---|
-| 2024 | upstox_intraday/NIFTY/NIFTY_2024.parquet | Upstox historical API |
-| 2025 | upstox_intraday/NIFTY/NIFTY_2025.parquet | Upstox historical API |
-| 2026 | kotak_live/NIFTY/NIFTY_2026.parquet | Kotak live collection |
+| Sample period | Dataset path | Source track | Primary use |
+|---|---|---|---|
+| 2024 | upstox_intraday/NIFTY/NIFTY_2024.parquet | Upstox historical API | Yes |
+| 2025 | upstox_intraday/NIFTY/NIFTY_2025.parquet | Upstox historical API | Yes |
+| 2026 | kotak_live/NIFTY/NIFTY_2026.parquet | Kotak live collection | Excluded pending completeness |
 
 Dataset card: https://huggingface.co/datasets/rissin/nse-options-intraday  
 Pinned revision: https://huggingface.co/datasets/rissin/nse-options-intraday/commit/78b1c5468255d18cf492984bfe6fe4e3ac874d7c
@@ -29,7 +29,7 @@ The workflow records SHA-256 hashes, byte sizes, source path, revision and downl
 
 ## Common primary window
 
-The primary backtest window is limited to the overlap of option and spot history: **2024-10-01 through 2026-04-30**, subject to day-level completeness and contract checks.
+The primary backtest window is **2024-10-01 through 2025-12-31**, subject to day-level completeness and contract checks.
 
 ## Source hierarchy and fallback
 
@@ -38,7 +38,7 @@ The primary backtest window is limited to the overlap of option and spot history
 3. Public GitHub/Kaggle/Hugging Face sources with explicit provenance.
 4. Composite datasets only when a documented source coverage gap requires it.
 
-A source failure or coverage gap is logged before fallback is used.
+A source failure or coverage gap is logged before fallback is used. A public Google Drive dataset advertised as Oct-2024 to Mar-2026 was identified from a public GitHub project, but its folder cannot currently be fetched reliably by the automated environment; it is therefore not used in the primary automated run.
 
 ## Reproducibility
 
