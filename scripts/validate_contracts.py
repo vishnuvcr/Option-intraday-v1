@@ -42,7 +42,7 @@ def sql_file_list(paths: list[Path]) -> str:
 
 def main() -> None:
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    option_paths = [ROOT / item["path"] for item in manifest["options_source"]["files"]]
+    option_paths = [CACHE / "hf_options" / item["source_path"] for item in manifest["options_source"]["files"]]
 
     spot_path = ROOT / "data" / "cache" / "spot" / "extracted" / "NIFTY_5min_5yr_2021_2026.csv"
     if not spot_path.exists():
