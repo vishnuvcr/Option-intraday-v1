@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 2 — Data acquisition & validation: composite-source fix committed; rerun pending**
+**Phase 2 — Data acquisition & validation: validator remediated; rerun pending**
 
 | Phase | Status |
 |---|---|
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. A source-coverage gap was found in the pinned HF snapshot and resolved explicitly with a same-revision composite. The corrected workflow must complete successfully and pass independent re-audit before Phase 3.
+P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. A source-coverage gap and a fixed-offset timezone validator defect were both remediated. The corrected workflow must complete successfully and pass independent re-audit before Phase 3.
 
 ## Key known limitation
 
