@@ -15,24 +15,21 @@ MANIFEST = ROOT / "research" / "data" / "ACQUISITION_MANIFEST.json"
 OUT = ROOT / "research" / "results"
 OUT.mkdir(parents=True, exist_ok=True)
 
-START = "2024-10-01"
-END = "2025-12-31"
-ENTRY = pd.Timestamp("09:30:00").time()
-EXIT = pd.Timestamp("15:15:00").time()
-STOP_POINTS = 100.0
-SLIPPAGE_POINTS = 1.0
+STRATEGY_CFG = json.loads((ROOT / "config" / "strategy.json").read_text(encoding="utf-8"))
+COST_CFG = json.loads((ROOT / "config" / "costs.json").read_text(encoding="utf-8"))
+START = COST_CFG["sample_start"]
+END = COST_CFG["sample_end"]
+STOP_POINTS = float(STRATEGY_CFG["stop_loss_points"])
+SLIPPAGE_POINTS = float(COST_CFG["primary_slippage_points_per_leg"])
 NEAR_ATM_MAX_DISTANCE = 25.0
-
-# Primary sample is entirely before 2026-03-01, so the pre-March-2026
-# exchange/IPFT components are the applicable schedule.
 COST = {
-    "brokerage_per_order": 10.0,
-    "stt_sell_rate": 0.0010,
-    "exchange_txn_rate": 0.0003503,  # Rs 3,503/crore
-    "ipft_rate": 0.0000050,          # Rs 50/crore
-    "sebi_rate": 0.0000010,          # 0.0001%
-    "gst_rate": 0.18,
-    "stamp_buy_rate": 0.00003,       # 0.003%
+    "brokerage_per_order": float(COST_CFG["brokerage_per_order_inr"]),
+    "stt_sell_rate": float(COST_CFG["stt_option_sale_rate"]),
+    "exchange_txn_rate": float(COST_CFG["exchange_transaction_rate"]),
+    "ipft_rate": float(COST_CFG["ipft_rate"]),
+    "sebi_rate": float(COST_CFG["sebi_turnover_rate"]),
+    "gst_rate": float(COST_CFG["gst_rate_on_brokerage_exchange_sebi_ipft"]),
+    "stamp_buy_rate": float(COST_CFG["stamp_duty_option_buy_rate"]),
 }
 
 
@@ -131,6 +128,10 @@ def short_pnl_points(realized_raw_points: float, legs: dict[str, dict[str, Any]]
 
 def should_stop(pnl_points: float, stop_points: float = STOP_POINTS) -> bool:
     return pnl_points <= -stop_points
+
+
+def allow_adjustment(next_timestamp: pd.Timestamp, exit_timestamp: pd.Timestamp) -> bool:
+    return next_timestamp < exit_timestamp
 
 
 def ratio_trigger(premium_a: float, premium_b: float) -> bool:
@@ -450,7 +451,7 @@ def main() -> None:
 
             # A new adjustment cannot be initiated for execution at 15:15,
             # because the locked strategy closes the entire position then.
-            if next_ts >= exit_ts:
+            if not allow_adjustment(next_ts, exit_ts):
                 continue
 
             hi = max(marks.values())
@@ -506,8 +507,7 @@ def main() -> None:
             )
             orders.extend([buy_rec, sell_rec])
             realized_raw += low_leg["raw_entry"] - old_open
-            realized_exec += low_leg["exec_entry"] - buy_rec["exec_price"]
-            realized_exec += sell_rec["exec_price"]
+            realized_exec += low_leg["exec_entry"] - buy_rec["exec_price"] + sell_rec["exec_price"]
             low_leg["strike"] = float(new_strike)
             low_leg["raw_entry"] = float(new_open)
             low_leg["exec_entry"] = sell_rec["exec_price"]
