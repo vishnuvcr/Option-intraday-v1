@@ -39,6 +39,7 @@ Public/free sources are preferred before paid sources. The planned primary intra
 - Phase 2 workflow: [.github/workflows/phase-2-data.yml](.github/workflows/phase-2-data.yml).
 - Selected option source: public Hugging Face 1-minute NIFTY options.
 - Selected spot source: public GitHub release with 5-minute NIFTY spot data through April 2026.
+- Phase 3 validation: 296 eligible trade dates; 13 deterministic exclusions for spot availability, lot-size transition, and near-ATM source coverage.
 
 ## Research gates
 
