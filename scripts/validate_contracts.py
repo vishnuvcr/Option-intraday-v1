@@ -97,7 +97,7 @@ def main() -> None:
     ORDER BY trade_date
     """
     expiry_map = con.execute(expiry_sql).df()
-    expiry_map["trade_date"] = pd.to_datetime(expiry_map["trade_date"]).dt.date.astype(str)
+    expiry_map["trade_date"] = pd.to_datetime(expiry_map["trade_date"]).dt.strftime("%Y-%m-%d")
     expiry_map["current_expiry"] = pd.to_datetime(expiry_map["current_expiry"], errors="coerce")
     expiry_map["next_expiry"] = pd.to_datetime(expiry_map["next_expiry"], errors="coerce")
 
@@ -155,14 +155,10 @@ def main() -> None:
     ORDER BY trade_date, leg
     """
     entries = con.execute(entry_sql).df()
+    entries["trade_date"] = pd.to_datetime(entries["trade_date"]).dt.strftime("%Y-%m-%d")
+    entries["expiry"] = pd.to_datetime(entries["expiry"], errors="coerce")
 
     # Exclude source dates that have no 09:30 spot.
-    excluded_dates = set(
-        pd.read_csv(spot_path)["timestamp"]
-        .astype(str)
-        .str.slice(0, 10)
-    )
-    excluded_dates = set()  # actual exclusions are taken from missing 09:30 rows below
     all_dates = set(expiry_map["trade_date"].dropna().astype(str))
     spot_0930_dates = set(spot_0930["trade_date"].astype(str))
     dates_without_0930 = sorted(all_dates - spot_0930_dates)
