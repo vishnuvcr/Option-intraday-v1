@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys. The first runs exposed a manifest-field mismatch, an over-strict 346-minute completeness gate, and incorrect historical lot-size cutoffs. All three have been remediated. Workflow run 23 passed with 301 eligible trade dates and zero global duplicate-key groups. Independent tester passed P3 with a no-forward-fill condition. Phase 4 is now authorized.
+P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys. The first runs exposed a manifest-field mismatch, an over-strict 346-minute completeness gate, and incorrect historical lot-size cutoffs. All three have been remediated. Workflow run 34 passed with 296 eligible trade dates and zero global duplicate-key groups after applying the NSE 50-point-grid near-ATM data-quality rule. Independent tester re-audit passed P3 with a no-forward-fill/fail-closed condition. Phase 4 is now authorized.
 
 ## Key known limitation
 
