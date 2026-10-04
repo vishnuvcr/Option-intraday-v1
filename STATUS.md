@@ -6,14 +6,14 @@
 
 ## Current phase
 
-**Phase 2 — Data acquisition & validation: final validator committed; rerun pending**
+**Phase 3 — Contract/PIT validation: implementation running**
 
 | Phase | Status |
 |---|---|
 | 0 Governance | ✅ passed |
 | 1 Strategy freeze | ✅ tester passed |
-| 2 Data acquisition | 🟡 workflow implemented/running |
-| 3 Data validation | ⚪ pending |
+| 2 Data acquisition | ✅ tester passed |
+| 3 Data validation | 🟡 contract validation running |
 | 4 Engine/cost model | ⚪ pending |
 | 5 Primary backtest | ⚪ pending |
 | 6 Robustness | ⚪ pending |
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. A source-coverage gap and validator/data-quality issues were remediated. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Minor 2024 out-of-session source contamination is explicitly reported and filtered. The corrected workflow must complete successfully and pass independent re-audit before Phase 3.
+P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys.
 
 ## Key known limitation
 
