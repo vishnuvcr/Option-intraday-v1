@@ -44,14 +44,14 @@ def main():
  fs="["+ ",".join("'"+p.replace("'","''")+"'" for p in paths)+"]"
  con.execute(f"CREATE VIEW options AS SELECT * FROM read_parquet({fs},union_by_name=true)")
  u=con.execute("""WITH e AS(SELECT DISTINCT CAST(date AS DATE) d,CAST(expiry AS DATE)e FROM options WHERE CAST(date AS DATE) BETWEEN DATE '2024-10-01' AND DATE '2025-12-31'),r AS(SELECT d,e,ROW_NUMBER()OVER(PARTITION BY d ORDER BY e)rn FROM e WHERE e>=d)SELECT d,MAX(CASE WHEN rn=1 THEN e END) ce,MAX(CASE WHEN rn=2 THEN e END) ne FROM r GROUP BY d""").df()
- u["trade_date"]=pd.to_datetime(u.d).dt.strftime("%Y-%m-%d"); u=u.drop(columns="d").merge(s0930,on="trade_date"); u["lc"]=u.ce.map(lot_size); u["ln"]=u.ne.map(lot_size); u=u[u.lc==u.ln].copy()
+ u["trade_date"]=pd.to_datetime(u.d).dt.strftime("%Y-%m-%d"); u=u.drop(columns="d").merge(s0930,on="trade_date"); u["lc"]=u["ce"].map(lot_size); u["ln"]=u["ne"].map(lot_size); u=u[u.lc==u.ln].copy()
  con.register("u",u)
  stage=OUT/"phase4_selected_bars.parquet"
  con.execute(f"""COPY(SELECT CAST(o.date AS DATE) trade_date,o.timestamp,CAST(o.expiry AS DATE) expiry,o.option_type,CAST(o.strike AS DOUBLE) strike,CAST(o.open AS DOUBLE) open,CAST(o.close AS DOUBLE) close FROM options o JOIN u ON CAST(o.date AS DATE)=CAST(u.trade_date AS DATE) AND ((CAST(o.expiry AS DATE)=u.ce AND o.option_type='CE') OR (CAST(o.expiry AS DATE)=u.ne AND o.option_type='PE')) WHERE CAST(o.timestamp AT TIME ZONE 'Asia/Kolkata' AS DATE)=CAST(u.trade_date AS DATE) AND CAST(o.timestamp AT TIME ZONE 'Asia/Kolkata' AS TIME) BETWEEN TIME '09:30:00' AND TIME '15:15:00') TO '{stage.as_posix()}'(FORMAT PARQUET,COMPRESSION ZSTD)""")
  bars=pd.read_parquet(stage); bars.trade_date=pd.to_datetime(bars.trade_date).dt.strftime("%Y-%m-%d"); bars.timestamp=pd.to_datetime(bars.timestamp)
  trades=[]; executions=[]
  for _,r in u.sort_values("trade_date").iterrows():
-  d=r.trade_date; df=bars[bars.trade_date==d].copy(); ce=pd.Timestamp(r.ce); ne=pd.Timestamp(r.ne); lot=int(r.lc)
+  d=r.trade_date; df=bars[bars.trade_date==d].copy(); ce=pd.Timestamp(r["ce"]); ne=pd.Timestamp(r["ne"]); lot=int(r["lc"])
   entry=pd.Timestamp(f"{d} 09:30:00",tz="Asia/Kolkata"); exit_ts=pd.Timestamp(f"{d} 15:15:00",tz="Asia/Kolkata")
   a=df[(df.timestamp==entry)&(df.expiry==ce)&(df.option_type=="CE")]; b=df[(df.timestamp==entry)&(df.expiry==ne)&(df.option_type=="PE")]
   ks,ps=nearest(a,r.spot),nearest(b,r.spot)
