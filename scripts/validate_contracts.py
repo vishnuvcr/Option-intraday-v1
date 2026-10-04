@@ -319,7 +319,7 @@ def main() -> None:
         lambda d: ";".join(reasons.get(d, []))
     )
     universe["lot_size_rule"] = universe["current_expiry"].map(
-        lambda x: f"<=2024-12-19:25;2024-12-26..2025-12-23:75" if pd.notna(x) else ""
+        lambda x: f"through_2024-12-26:25;2025-01-02_through_2025-12-30:75;after_2025-12-30:65" if pd.notna(x) else ""
     )
 
     UNIVERSE_OUT.parent.mkdir(parents=True, exist_ok=True)
