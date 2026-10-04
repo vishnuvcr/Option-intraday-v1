@@ -1,35 +1,25 @@
 {
-  "primary_window": {
-    "start": "2024-10-01",
-    "end": "2025-12-31"
-  },
-  "trade_dates_in_option_source": 311,
-  "trade_dates_with_09_30_spot": 309,
-  "trade_dates_missing_09_30_spot": [
-    "2024-11-01",
-    "2025-10-21"
+  "primary_window": {"start": "2024-10-01", "end": "2025-12-31"},
+  "option_source_trade_dates": 311,
+  "dates_with_09_30_spot": 309,
+  "missing_09_30_spot_dates": ["2024-11-01", "2025-10-21"],
+  "lot_size_transition_exclusions": [
+    "2024-12-20","2024-12-23","2024-12-24","2024-12-26",
+    "2025-12-24","2025-12-26","2025-12-29","2025-12-30"
   ],
-  "trade_dates_excluded_for_initial_contract_quality": [
-    "2024-12-20",
-    "2024-12-23",
-    "2024-12-24",
-    "2024-12-26",
-    "2025-12-24",
-    "2025-12-26",
-    "2025-12-29",
-    "2025-12-30"
+  "near_atm_source_gap_exclusions": [
+    "2024-12-13","2024-12-16","2024-12-17","2024-12-18","2024-12-19"
   ],
-  "eligible_trade_dates": 301,
-  "current_expiry_unique_count": 67,
-  "next_expiry_unique_count": 67,
-  "duplicate_key_groups": 0,
-  "duplicate_rows": 0,
-  "expected_minutes_0930_to_1515": 346,
-  "completeness_policy": "record gaps in Phase 3; require minimum entry/exit observations; Phase 4 excludes unexecutable monitoring events without forward-fill",
-  "lot_size_regimes": {
-    "through_2024_12_26": 25,
+  "eligible_trade_dates": 296,
+  "unique_current_expiries": 67,
+  "unique_next_expiries": 67,
+  "global_duplicate_key_groups": 0,
+  "global_duplicate_rows": 0,
+  "near_atm_rule": {"nifty_strike_interval_points": 50, "maximum_distance_points": 25},
+  "lot_size_regime": {
+    "through_2024-12-26": 25,
     "2025-01-02_through_2025-12-30": 75,
     "after_2025-12-30": 65
   },
-  "workflow_run_id": 37237112271
+  "validation_artifact_run": 37237371288
 }
