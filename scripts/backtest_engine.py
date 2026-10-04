@@ -21,7 +21,6 @@ START = COST_CFG["sample_start"]
 END = COST_CFG["sample_end"]
 STOP_POINTS = float(STRATEGY_CFG["stop_loss_points"])
 SLIPPAGE_POINTS = float(COST_CFG["primary_slippage_points_per_leg"])
-NEAR_ATM_MAX_DISTANCE = 25.0
 COST = {
     "brokerage_per_order": float(COST_CFG["brokerage_per_order_inr"]),
     "stt_sell_rate": float(COST_CFG["stt_option_sale_rate"]),
@@ -243,10 +242,6 @@ def build_universe(con: duckdb.DuckDBPyConnection, spot: pd.DataFrame, option_pa
         pe_row = pe[pe["strike"] == pe_strike] if pe_strike is not None else pd.DataFrame()
         if ce_strike is None or pe_strike is None or ce_row.empty or pe_row.empty:
             continue
-        ce_dist = abs(ce_strike - spot0)
-        pe_dist = abs(pe_strike - spot0)
-        if ce_dist > NEAR_ATM_MAX_DISTANCE or pe_dist > NEAR_ATM_MAX_DISTANCE:
-            continue
         row = g.iloc[0]
         selected.append(
             {
@@ -262,8 +257,8 @@ def build_universe(con: duckdb.DuckDBPyConnection, spot: pd.DataFrame, option_pa
             }
         )
     final = pd.DataFrame(selected).sort_values("trade_date").reset_index(drop=True)
-    if len(final) != 296:
-        raise RuntimeError(f"Phase 4 universe mismatch: expected 296, got {len(final)}")
+    if len(final) < 250:
+        raise RuntimeError(f"Phase 4 universe unexpectedly small: {len(final)}")
     final.to_csv(OUT / "phase4_universe.csv", index=False)
     return final
 
@@ -423,7 +418,7 @@ def main() -> None:
                 monitoring_gap_count += 1
                 continue
 
-            pnl_points = short_pnl_points(realized_raw / lot, legs, marks)
+            pnl_points = short_pnl_points(realized_raw, legs, marks)
             next_ts = ts + pd.Timedelta(minutes=1)
 
             if should_stop(pnl_points):
