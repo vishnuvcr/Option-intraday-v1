@@ -1,0 +1,35 @@
+{
+  "primary_window": {
+    "start": "2024-10-01",
+    "end": "2025-12-31"
+  },
+  "trade_dates_in_option_source": 311,
+  "trade_dates_with_09_30_spot": 309,
+  "trade_dates_missing_09_30_spot": [
+    "2024-11-01",
+    "2025-10-21"
+  ],
+  "trade_dates_excluded_for_initial_contract_quality": [
+    "2024-12-20",
+    "2024-12-23",
+    "2024-12-24",
+    "2024-12-26",
+    "2025-12-24",
+    "2025-12-26",
+    "2025-12-29",
+    "2025-12-30"
+  ],
+  "eligible_trade_dates": 301,
+  "current_expiry_unique_count": 67,
+  "next_expiry_unique_count": 67,
+  "duplicate_key_groups": 0,
+  "duplicate_rows": 0,
+  "expected_minutes_0930_to_1515": 346,
+  "completeness_policy": "record gaps in Phase 3; require minimum entry/exit observations; Phase 4 excludes unexecutable monitoring events without forward-fill",
+  "lot_size_regimes": {
+    "through_2024_12_26": 25,
+    "2025-01-02_through_2025-12-30": 75,
+    "after_2025-12-30": 65
+  },
+  "workflow_run_id": 37237112271
+}
