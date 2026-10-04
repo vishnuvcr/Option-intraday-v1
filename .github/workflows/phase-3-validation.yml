@@ -1,0 +1,58 @@
+name: Phase 3 contract and point-in-time validation
+
+on:
+  push:
+    branches:
+      - developer/phase-3-contract-validation
+  workflow_dispatch:
+
+concurrency:
+  group: phase-3-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Restore Phase 2 market-data cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/cache/hf_options
+            data/cache/spot
+          key: option-intraday-data-v1-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
+          restore-keys: |
+            option-intraday-data-v1-${{ runner.os }}-
+
+      - name: Assert cached source data exists
+        run: |
+          test -f data/cache/hf_options/upstox_intraday/NIFTY/NIFTY_2024.parquet
+          test -f data/cache/hf_options/upstox_intraday/NIFTY/NIFTY_2025.parquet
+          test -f data/cache/spot/extracted/NIFTY_5min_5yr_2021_2026.csv
+
+      - name: Run contract validation
+        run: python scripts/validate_contracts.py
+
+      - name: Upload Phase 3 validation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-3-contract-validation
+          path: |
+            research/data/CONTRACT_UNIVERSE.csv
+            research/data/CONTRACT_VALIDATION_SUMMARY.json
