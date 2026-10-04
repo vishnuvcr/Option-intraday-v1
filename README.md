@@ -4,7 +4,7 @@ Research repository for a reproducible backtest of the **Intraday Asymmetric Pre
 
 ## Research state
 
-**Phase 2 underway — locked strategy passed P1 independent audit; data acquisition/validation is running.**
+**Phase 2 underway — P1 passed; Phase 2 tester block remediated; rerun pending.**
 
 The study is run as a gated quantitative research program with isolated developer/tester roles. The current locked plan and all status/error logs are version-controlled.
 
@@ -31,7 +31,7 @@ The full deterministic operationalization is in [research/RESEARCH_PLAN.md](rese
 
 ## Data and cost policy
 
-Public/free sources are preferred before paid sources. The planned primary intraday source is a public Hugging Face dataset whose card reports 1-minute NIFTY options from October 2024 onward; official NSE documents will be used for contract/lot-size and levy reconciliation. Paytm Money brokerage, statutory levies, GST, and slippage are modeled separately so gross and net results can be distinguished.
+Public/free sources are preferred before paid sources. The planned primary intraday source is a public Hugging Face dataset pinned to an immutable revision; official NSE documents are used for contract/lot-size and levy reconciliation. Paytm Money brokerage, statutory levies, GST, and slippage are modeled separately so gross and net results can be distinguished.
 
 ## Current evidence
 
