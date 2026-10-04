@@ -18,8 +18,12 @@ SPOT_ROOT = CACHE / "spot"
 MANIFEST = CACHE / "acquisition_manifest.json"
 
 HF_REPO = "rissin/nse-options-intraday"
-HF_YEARS = ["2024", "2025", "2026"]
 HF_REVISION = "78b1c5468255d18cf492984bfe6fe4e3ac874d7c"
+HF_FILES = {
+    "upstox_2024": "upstox_intraday/NIFTY/NIFTY_2024.parquet",
+    "upstox_2025": "upstox_intraday/NIFTY/NIFTY_2025.parquet",
+    "kotak_2026": "kotak_live/NIFTY/NIFTY_2026.parquet",
+}
 SPOT_RELEASE_URL = "https://github.com/voletiramu/nse-fno-1min-data/releases/download/indices-v1.0.0/nifty_indices_5yr.zip"
 EXPECTED_SPOT_SHA256 = "0c1f3de848a4e8c05e233c195685e7ae560d56d08df8baba8b2ffcfac699d3f8"
 
@@ -60,13 +64,13 @@ def download_options() -> list[Path]:
     downloaded = snapshot_download(
         repo_id=HF_REPO,
         repo_type="dataset",
-        allow_patterns=[f"upstox_intraday/NIFTY/NIFTY_{y}.parquet" for y in HF_YEARS],
+        allow_patterns=list(HF_FILES.values()),
         revision=HF_REVISION,
         local_dir=str(HF_ROOT),
         token=token,
     )
     base = Path(downloaded)
-    paths = [base / "upstox_intraday" / "NIFTY" / f"NIFTY_{y}.parquet" for y in HF_YEARS]
+    paths = [base / rel for rel in HF_FILES.values()]
     missing = [str(p) for p in paths if not p.exists()]
     if missing:
         raise FileNotFoundError("Missing option files: " + ", ".join(missing))
@@ -80,7 +84,7 @@ def main() -> None:
         "options": {
             "repo_id": HF_REPO,
             "revision": HF_REVISION,
-            "files": [{"path": str(p.relative_to(ROOT)), "sha256": sha256(p), "bytes": p.stat().st_size} for p in option_paths],
+            "files": [{"track": track, "source_path": source_path, "path": str((Path(HF_ROOT) / source_path).relative_to(ROOT)), "sha256": sha256(Path(HF_ROOT) / source_path), "bytes": (Path(HF_ROOT) / source_path).stat().st_size} for track, source_path in HF_FILES.items()],
         },
         "spot": {
             "release_url": SPOT_RELEASE_URL,
