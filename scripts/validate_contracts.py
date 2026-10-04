@@ -22,6 +22,7 @@ ENTRY_TIME = "09:30:00"
 SESSION_START = "09:30:00"
 SESSION_END = "15:15:00"
 EXPECTED_MINUTES = 346
+NEAR_ATM_MAX_DISTANCE = 25.0  # NSE NIFTY weekly strike interval is 50 points
 
 
 def lot_size(expiry: pd.Timestamp) -> int:
@@ -231,11 +232,16 @@ def main() -> None:
         if pd.isna(row["current_ce_strike"]) or pd.isna(row["next_pe_strike"]):
             reasons[d].append("missing_09:30_entry_strike")
             continue
-        if pd.isna(row["current_ce_entry_open"]) or pd.isna(row["next_pe_entry_open"]):
-            reasons[d].append("missing_09:30_entry_price")
+        ce_distance = abs(float(row["current_ce_strike"]) - float(row["spot_0930"]))
+        pe_distance = abs(float(row["next_pe_strike"]) - float(row["spot_0930"]))
+        if ce_distance > NEAR_ATM_MAX_DISTANCE or pe_distance > NEAR_ATM_MAX_DISTANCE:
+            reasons[d].append(
+                f"near_atm_data_gap:ce_{ce_distance:.2f}_pe_{pe_distance:.2f}_max_{NEAR_ATM_MAX_DISTANCE:.2f}"
+            )
             continue
         if float(row["current_ce_entry_open"]) <= 0 or float(row["next_pe_entry_open"]) <= 0:
             reasons[d].append("nonpositive_09:30_entry_price")
+            continue
 
     # Contract-level completeness for the two initial legs from 09:30 through 15:15.
     eligible = universe[
