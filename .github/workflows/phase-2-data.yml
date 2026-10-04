@@ -6,6 +6,10 @@ on:
       - developer/phase-2-data
   workflow_dispatch:
 
+concurrency:
+  group: phase-2-data-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
