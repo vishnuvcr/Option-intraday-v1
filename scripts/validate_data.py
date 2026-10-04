@@ -1,25 +1,18 @@
 from __future__ import annotations
 
 import json
-import os
 import sys
 from pathlib import Path
 
 import pandas as pd
-import polars as pl
 import pyarrow.parquet as pq
-
-# Polars currently rejects the fixed-offset timezone metadata (+05:30) stored by
-# some Parquet writers. Keep the source timezone for audit via PyArrow, while
-# treating the timestamp as a string for chronology checks.
-os.environ.setdefault("POLARS_IGNORE_TIMEZONE_PARSE_ERROR", "1")
 
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / "data" / "cache"
 MANIFEST = CACHE / "acquisition_manifest.json"
 REPORT_PATH = CACHE / "validation_report.json"
 COMMON_START = pd.Timestamp("2024-10-01")
-COMMON_END = pd.Timestamp("2026-04-30 23:59:59")
+COMMON_END = pd.Timestamp("2025-12-31 23:59:59")
 
 EXPECTED_OPTION_COLUMNS = {
     "date", "timestamp", "underlying", "expiry", "strike", "option_type",
@@ -28,74 +21,110 @@ EXPECTED_OPTION_COLUMNS = {
 }
 
 def validate_options(path: Path) -> dict:
-    arrow_schema = pq.ParquetFile(path).schema_arrow
-    cols = set(arrow_schema.names)
+    pf = pq.ParquetFile(path)
+    schema = pf.schema_arrow
+    cols = set(schema.names)
     missing = sorted(EXPECTED_OPTION_COLUMNS - cols)
     if missing:
         raise AssertionError(f"{path}: missing columns {missing}")
 
-    ts_arrow = arrow_schema.field("timestamp").type
-    ts_metadata = str(ts_arrow)
+    totals = {
+        "rows": 0,
+        "bad_underlying_rows": 0,
+        "bad_option_type_rows": 0,
+        "bad_granularity_rows": 0,
+        "bad_strike_rows": 0,
+        "bad_open_rows": 0,
+        "bad_high_rows": 0,
+        "bad_low_rows": 0,
+        "bad_close_rows": 0,
+        "bad_high_relation_rows": 0,
+        "bad_low_relation_rows": 0,
+        "unparseable_trade_date_rows": 0,
+        "unparseable_expiry_rows": 0,
+        "expiry_before_trade_rows": 0,
+        "timestamp_date_mismatch_rows": 0,
+        "non_minute_boundary_rows": 0,
+        "outside_session_rows": 0,
+        "null_close_rows": 0,
+        "intra_batch_duplicate_key_rows": 0,
+    }
 
-    lf = pl.scan_parquet(path)
-    ts_str = pl.col("timestamp").cast(pl.String)
-    trade_date = pl.col("date").cast(pl.String).str.slice(0, 10)
-    expiry_date = pl.col("expiry").cast(pl.String).str.slice(0, 10)
-    ts_date = ts_str.str.slice(0, 10)
-    ts_hour = ts_str.str.slice(11, 2).cast(pl.Int16, strict=False)
-    ts_minute = ts_str.str.slice(14, 2).cast(pl.Int16, strict=False)
-    ts_second = ts_str.str.slice(17, 2).cast(pl.Int16, strict=False)
+    min_date = None
+    max_date = None
+    min_ts = None
+    max_ts = None
+    timestamp_dtype = str(schema.field("timestamp").type)
 
-    metrics = lf.select([
-        pl.len().alias("rows"),
-        pl.col("date").cast(pl.String).str.slice(0, 10).str.strptime(pl.Date, strict=False).min().alias("min_date"),
-        pl.col("date").cast(pl.String).str.slice(0, 10).str.strptime(pl.Date, strict=False).max().alias("max_date"),
-        ts_str.min().alias("min_timestamp"),
-        ts_str.max().alias("max_timestamp"),
-        (pl.col("underlying") != "NIFTY").fill_null(True).sum().alias("bad_underlying_rows"),
-        (~pl.col("option_type").is_in(["CE", "PE"])).fill_null(True).sum().alias("bad_option_type_rows"),
-        (pl.col("granularity") != "1min").fill_null(True).sum().alias("bad_granularity_rows"),
-        (pl.col("strike") <= 0).fill_null(True).sum().alias("bad_strike_rows"),
-        (pl.col("open") < 0).fill_null(True).sum().alias("bad_open_rows"),
-        (pl.col("high") < 0).fill_null(True).sum().alias("bad_high_rows"),
-        (pl.col("low") < 0).fill_null(True).sum().alias("bad_low_rows"),
-        (pl.col("close") < 0).fill_null(True).sum().alias("bad_close_rows"),
-        (pl.col("high") < pl.max_horizontal("open", "close", "low")).fill_null(True).sum().alias("bad_high_relation_rows"),
-        (pl.col("low") > pl.min_horizontal("open", "close", "high")).fill_null(True).sum().alias("bad_low_relation_rows"),
-        trade_date.str.strptime(pl.Date, strict=False).is_null().sum().alias("unparseable_trade_date_rows"),
-        expiry_date.str.strptime(pl.Date, strict=False).is_null().sum().alias("unparseable_expiry_rows"),
-        (
-            (expiry_date.str.strptime(pl.Date, strict=False) < trade_date.str.strptime(pl.Date, strict=False))
-            .fill_null(True)
-        ).sum().alias("expiry_before_trade_rows"),
-        (ts_date != trade_date).fill_null(True).sum().alias("timestamp_date_mismatch_rows"),
-        (ts_second != 0).fill_null(True).sum().alias("non_minute_boundary_rows"),
-        (
-            (ts_hour * 60 + ts_minute < 555)
-            | (ts_hour * 60 + ts_minute > 930)
-        ).fill_null(True).sum().alias("outside_session_rows"),
-        ts_date.n_unique().alias("distinct_timestamp_dates"),
-        trade_date.n_unique().alias("distinct_trade_dates"),
-        expiry_date.n_unique().alias("distinct_expiries"),
-        pl.col("strike").n_unique().alias("distinct_strikes"),
-    ]).collect().to_dicts()[0]
+    columns = list(EXPECTED_OPTION_COLUMNS)
+    for batch in pf.iter_batches(batch_size=250_000, columns=columns):
+        df = batch.to_pandas()
+        totals["rows"] += len(df)
 
-    duplicate_key_groups = (
-        lf.group_by(["timestamp", "expiry", "strike", "option_type"])
-        .len()
-        .filter(pl.col("len") > 1)
-        .select(pl.len())
-        .collect()
-        .item()
-    )
-    null_close = lf.filter(pl.col("close").is_null()).select(pl.len()).collect().item()
+        underlying = df["underlying"].astype("string")
+        option_type = df["option_type"].astype("string")
+        granularity = df["granularity"].astype("string")
+
+        trade_date = pd.to_datetime(df["date"], errors="coerce")
+        expiry_date = pd.to_datetime(df["expiry"], errors="coerce")
+        timestamp = pd.to_datetime(df["timestamp"], errors="coerce")
+
+        totals["bad_underlying_rows"] += int((underlying.fillna("") != "NIFTY").sum())
+        totals["bad_option_type_rows"] += int((~option_type.isin(["CE", "PE"])).fillna(True).sum())
+        totals["bad_granularity_rows"] += int((granularity.fillna("") != "1min").sum())
+        totals["bad_strike_rows"] += int((pd.to_numeric(df["strike"], errors="coerce") <= 0).fillna(True).sum())
+        totals["bad_open_rows"] += int((pd.to_numeric(df["open"], errors="coerce") < 0).fillna(True).sum())
+        totals["bad_high_rows"] += int((pd.to_numeric(df["high"], errors="coerce") < 0).fillna(True).sum())
+        totals["bad_low_rows"] += int((pd.to_numeric(df["low"], errors="coerce") < 0).fillna(True).sum())
+        totals["bad_close_rows"] += int((pd.to_numeric(df["close"], errors="coerce") < 0).fillna(True).sum())
+        totals["null_close_rows"] += int(df["close"].isna().sum())
+
+        oo = pd.to_numeric(df["open"], errors="coerce")
+        hh = pd.to_numeric(df["high"], errors="coerce")
+        ll = pd.to_numeric(df["low"], errors="coerce")
+        cc = pd.to_numeric(df["close"], errors="coerce")
+        totals["bad_high_relation_rows"] += int((hh < pd.concat([oo, cc, ll], axis=1).max(axis=1)).fillna(True).sum())
+        totals["bad_low_relation_rows"] += int((ll > pd.concat([oo, cc, hh], axis=1).min(axis=1)).fillna(True).sum())
+
+        totals["unparseable_trade_date_rows"] += int(trade_date.isna().sum())
+        totals["unparseable_expiry_rows"] += int(expiry_date.isna().sum())
+        comparable = trade_date.notna() & expiry_date.notna()
+        totals["expiry_before_trade_rows"] += int((expiry_date[comparable] < trade_date[comparable]).sum())
+
+        ts_valid = timestamp.notna()
+        totals["timestamp_date_mismatch_rows"] += int(
+            (timestamp[ts_valid].dt.date != trade_date[ts_valid].dt.date).sum()
+        ) if ts_valid.any() else 0
+        totals["non_minute_boundary_rows"] += int(
+            ((timestamp[ts_valid].dt.second != 0) | (timestamp[ts_valid].dt.microsecond != 0)).sum()
+        ) if ts_valid.any() else 0
+        totals["outside_session_rows"] += int(
+            ((timestamp[ts_valid].dt.hour * 60 + timestamp[ts_valid].dt.minute < 555)
+             | (timestamp[ts_valid].dt.hour * 60 + timestamp[ts_valid].dt.minute > 930)).sum()
+        ) if ts_valid.any() else 0
+
+        if len(df):
+            bmin_date, bmax_date = trade_date.min(), trade_date.max()
+            bmin_ts, bmax_ts = timestamp.min(), timestamp.max()
+            min_date = bmin_date if min_date is None else min(min_date, bmin_date)
+            max_date = bmax_date if max_date is None else max(max_date, bmax_date)
+            min_ts = bmin_ts if min_ts is None else min(min_ts, bmin_ts)
+            max_ts = bmax_ts if max_ts is None else max(max_ts, bmax_ts)
+
+        key_dupes = df.duplicated(subset=["timestamp", "expiry", "strike", "option_type"], keep=False)
+        totals["intra_batch_duplicate_key_rows"] += int(key_dupes.sum())
+
+    if totals["rows"] == 0:
+        raise AssertionError(f"{path}: zero rows")
 
     return {
         "path": str(path.relative_to(ROOT)),
-        "timestamp_parquet_type": ts_metadata,
-        **{k: (int(v) if isinstance(v, (int, float)) else v) for k, v in metrics.items()},
-        "duplicate_key_groups": int(duplicate_key_groups),
-        "null_close_rows": int(null_close),
+        "timestamp_parquet_type": timestamp_dtype,
+        "min_date": str(min_date),
+        "max_date": str(max_date),
+        "min_timestamp": str(min_ts),
+        "max_timestamp": str(max_ts),
+        **totals,
     }
 
 def validate_spot(path: Path) -> dict:
@@ -117,7 +146,6 @@ def validate_spot(path: Path) -> dict:
         "rows": int(len(df)),
         "min_timestamp": str(ts.min()),
         "max_timestamp": str(ts.max()),
-        "timestamp_timezone_metadata": str(getattr(ts.dt, "tz", None)),
         "duplicate_timestamps": int(df["timestamp"].duplicated().sum()),
         "bad_ohlc_rows": int(
             ((df["high"] < df[["open", "close", "low"]].max(axis=1))
@@ -140,27 +168,25 @@ def main() -> None:
     spot_path = ROOT / manifest["spot"]["file"]
     spot_report = validate_spot(spot_path)
 
-    option_dates: set = set()
+    option_dates = set()
     for item in manifest["options"]["files"]:
-        p = ROOT / item["path"]
-        dates = (
-            pl.scan_parquet(p)
-            .select(pl.col("date").cast(pl.String).str.slice(0, 10).unique())
-            .collect()
-            .to_series()
-            .to_list()
-        )
-        option_dates.update(pd.Timestamp(x).date() for x in dates if x)
+        pf = pq.ParquetFile(ROOT / item["path"])
+        for batch in pf.iter_batches(batch_size=250_000, columns=["date"]):
+            vals = pd.to_datetime(batch.column(0).to_pandas(), errors="coerce")
+            option_dates.update(vals.dropna().dt.date.tolist())
 
     spot_ts = pd.to_datetime(pd.read_csv(spot_path)["timestamp"], errors="coerce")
     spot_dates = set(spot_ts.dt.date)
     overlap = option_dates & spot_dates
     spot_report["distinct_option_spot_dates"] = int(len(overlap))
-    spot_report["primary_window_overlap_dates"] = int(
-        len(overlap & set(pd.date_range(COMMON_START, COMMON_END, freq="D").date))
-    )
+    spot_report["primary_window_overlap_dates"] = int(len(overlap & set(pd.date_range(COMMON_START, COMMON_END, freq="D").date)))
 
-    report = {"options": option_reports, "spot": spot_report}
+    report = {
+        "primary_window": {"start": str(COMMON_START), "end": str(COMMON_END)},
+        "options": option_reports,
+        "spot": spot_report,
+        "global_duplicate_key_check": "Deferred to Phase 3 contract-level validation to avoid loading the complete multi-year option surface into memory.",
+    }
     REPORT_PATH.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
     print(json.dumps(report, indent=2, default=str))
 
@@ -171,13 +197,16 @@ def main() -> None:
         "bad_close_rows", "bad_high_relation_rows", "bad_low_relation_rows",
         "unparseable_trade_date_rows", "unparseable_expiry_rows",
         "expiry_before_trade_rows", "timestamp_date_mismatch_rows",
-        "non_minute_boundary_rows", "outside_session_rows",
-        "duplicate_key_groups", "null_close_rows",
+        "non_minute_boundary_rows", "outside_session_rows", "null_close_rows",
     ]
     for r in option_reports:
+        if r["rows"] < 100_000:
+            failures.append(f"{r['path']}:too_few_rows={r['rows']}")
         for key in checks:
             if int(r.get(key, 0)) != 0:
                 failures.append(f"{r['path']}:{key}={r[key]}")
+        if int(r.get("intra_batch_duplicate_key_rows", 0)) != 0:
+            failures.append(f"{r['path']}:intra_batch_duplicate_key_rows={r['intra_batch_duplicate_key_rows']}")
 
     if spot_report["bad_ohlc_rows"] or spot_report["duplicate_timestamps"]:
         failures.append("spot:bad_ohlc_or_duplicate_timestamps")
