@@ -26,9 +26,14 @@ EXPECTED_MINUTES = 346
 
 def lot_size(expiry: pd.Timestamp) -> int:
     d = expiry.date()
-    if d <= pd.Timestamp("2024-12-19").date():
+    # NSE Circular 131/2024: NIFTY weekly expiry 19-Dec-2024 was the last
+    # weekly expiry with the old 25 lot; 02-Jan-2025 was the first revised
+    # weekly expiry. The 26-Dec-2024 weekly expiry remained on the old regime.
+    if d <= pd.Timestamp("2024-12-26").date():
         return 25
-    if d <= pd.Timestamp("2025-12-23").date():
+    # NSE Circular 176/2025: weekly/monthly contracts retain 75 through
+    # 30-Dec-2025 expiry; subsequent contracts use 65.
+    if d <= pd.Timestamp("2025-12-30").date():
         return 75
     return 65
 
@@ -270,12 +275,19 @@ def main() -> None:
     """
     completeness = con.execute(completeness_sql).df()
 
+    # Do not silently forward-fill missing option bars. Phase 3 records
+    # completeness; the Phase 4 engine will exclude a trade if a required
+    # execution/monitoring observation is unavailable. For PIT validation,
+    # an initial contract needs at least its 09:30 entry and a 15:15 exit
+    # observation to be eligible for the primary ledger.
     bad_days = set()
+    completeness["distinct_minutes"] = completeness["distinct_minutes"].fillna(0).astype(int)
+    completeness["has_minimum_execution_observations"] = completeness["distinct_minutes"] >= 2
     for _, row in completeness.iterrows():
-        if int(row["distinct_minutes"] or 0) != EXPECTED_MINUTES:
+        if not bool(row["has_minimum_execution_observations"]):
             bad_days.add(str(row["trade_date"]))
             reasons.setdefault(str(row["trade_date"]), []).append(
-                f"incomplete_initial_leg:{row['option_type']}:{int(row['distinct_minutes'] or 0)}_minutes"
+                f"missing_entry_or_exit_observation:{row['option_type']}:{int(row['distinct_minutes'])}_minutes"
             )
 
     # Global duplicate-key audit over the validated primary source.
@@ -325,9 +337,11 @@ def main() -> None:
         "duplicate_key_groups": int(duplicates["duplicate_key_groups"]),
         "duplicate_rows": int(duplicates["duplicate_rows"]),
         "expected_minutes_0930_to_1515": EXPECTED_MINUTES,
+        "completeness_policy": "record gaps in Phase 3; require minimum entry/exit observations; Phase 4 excludes unexecutable monitoring events without forward-fill",
         "lot_size_regimes": {
-            "through_2024-12-19": 25,
-            "2024-12-26_through_2025-12-23": 75,
+            "through_2024-12-26": 25,
+            "2025-01-02_through_2025-12-30": 75,
+            "after_2025-12-30": 65,
         },
     }
     SUMMARY_OUT.write_text(json.dumps(summary, indent=2, default=str), encoding="utf-8")
