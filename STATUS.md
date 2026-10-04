@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 2 — Data acquisition & validation: workflow running**
+**Phase 2 — Data acquisition & validation: remediated; rerun pending**
 
 | Phase | Status |
 |---|---|
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 passed. Phase 2 now acquires and hashes public option + spot sources, validates schemas/invariants, caches data, and publishes manifest/report artifacts. Performance engine remains blocked until data gates pass.
+P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. The corrected Phase 2 workflow must complete successfully and pass independent re-audit before Phase 3.
 
 ## Key known limitation
 
