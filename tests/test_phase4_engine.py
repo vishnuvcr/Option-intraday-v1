@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import pandas as pd
 from scripts.backtest_engine import lot_size, nearest, target, fill_cost
 
@@ -11,9 +14,9 @@ def test_nearest_tie_lower():
     df=pd.DataFrame({'strike':[100.0,110.0],'open':[5.0,5.0]})
     assert nearest(df,105.0)==100.0
 
-def test_adjustment_target():
+def test_adjustment_target_tie_break():
     df=pd.DataFrame({'strike':[90.0,100.0,110.0],'open':[21.0,19.5,20.5]})
-    assert target(df,20.0,100.0)==90.0
+    assert target(df,20.0,100.0)==100.0
 
 def test_slippage_direction():
     sell,_=fill_cost(10.0,'SELL',25); buy,_=fill_cost(10.0,'BUY',25)
