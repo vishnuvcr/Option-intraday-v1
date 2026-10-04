@@ -2,7 +2,7 @@
 
 ## Research question
 
-**Does the locked intraday “Current-Week Call + Next-Week Put” asymmetric-premium strategy generate economically meaningful, reproducible NIFTY 50 option returns after realistic execution costs and Paytm Money charges over the available 1-minute historical sample?**
+**Does the locked intraday “Current-Week Call + Next-Week Put” asymmetric-premium strategy generate economically meaningful, reproducible NIFTY 50 option returns after realistic execution costs and Paytm Money charges over the validated 1-minute historical sample?**
 
 Secondary questions:
 1. How often does the 50%-relative-premium adjustment trigger?
@@ -92,7 +92,7 @@ Priority order:
 3. Public GitHub/Kaggle/Hugging Face sources with explicit provenance.
 4. Composite data only when individual public sources have documented coverage gaps.
 
-A current candidate source is the public Hugging Face `rissin/nse-options-intraday` dataset, which reports NIFTY 1-minute intraday option data from October 2024 onward and identifies Upstox as the intraday source. Official NSE contract/lot-size and levy schedules will be used to reconcile the strategy ledger.
+A current primary source is the immutable revision of public Hugging Face `rissin/nse-options-intraday`, using the validated Upstox NIFTY 2024 and 2025 partitions. Official NSE contract/lot-size and levy schedules will reconcile the strategy ledger. The 2026 Kotak partition in the same snapshot is excluded from the primary sample pending completeness validation.
 
 ## Deliverables
 
@@ -105,6 +105,10 @@ A current candidate source is the public Hugging Face `rissin/nse-options-intrad
 - error and research logs;
 - tester gate reports;
 - final manuscript and appendices.
+
+## Data-availability decision
+
+The study will not be extended indefinitely to obtain later years. The primary result is based on the longest validated free minute-level option sample that can be reproduced automatically without discretionary data selection. A future 2026 backfill can be evaluated as a separately scoped extension.
 
 ## Stop condition
 
