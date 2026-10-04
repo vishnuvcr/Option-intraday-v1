@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 3 — Contract/PIT validation: validator schema defect remediated; rerun running**
+**Phase 3 — Contract/PIT validation: completeness and lot-size defects remediated; rerun running**
 
 | Phase | Status |
 |---|---|
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys. The first run exposed a manifest-field mismatch; the validator now consumes the canonical source_path field.
+P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys. The first runs exposed a manifest-field mismatch, an over-strict 346-minute completeness gate, and incorrect historical lot-size cutoffs. All three have been remediated; the rerun is the active gate.
 
 ## Key known limitation
 
