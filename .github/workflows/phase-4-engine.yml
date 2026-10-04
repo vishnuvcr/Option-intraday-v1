@@ -1,0 +1,48 @@
+name: Phase 4 engine and cost model
+
+on:
+  push:
+    branches:
+      - developer/phase-4-engine-costs
+  workflow_dispatch:
+
+concurrency:
+  group: phase-4-engine-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  engine-tests-and-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: |
+            data/cache/hf_options
+            data/cache/spot
+          key: option-intraday-phase4-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
+          restore-keys: |
+            option-intraday-phase4-${{ runner.os }}-
+      - name: Acquire source data on cache miss
+        if: ${{ hashFiles('data/cache/hf_options/upstox_intraday/NIFTY/NIFTY_2024.parquet') == '' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/acquire_data.py
+      - run: pytest -q tests/test_phase4_engine.py
+      - run: python scripts/backtest_engine.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase-4-primary-engine-output
+          path: |
+            research/results/primary_backtest_summary.json
+            research/results/trade_ledger.csv
+            research/results/execution_ledger.csv
