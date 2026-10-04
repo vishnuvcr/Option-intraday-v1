@@ -1,6 +1,6 @@
 # Cost Schedule — NIFTY Options
 
-Primary sample: 2024-10-01 through 2026-04-30.
+Primary sample: 2024-10-01 through 2025-12-31.
 
 ## Paytm Money
 - F&O brokerage: Rs 10 per executed F&O order in the current public F&O FAQ.
