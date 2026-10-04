@@ -6,13 +6,13 @@
 
 ## Current phase
 
-**Phase 1 — Strategy freeze: awaiting independent re-audit**
+**Phase 2 — Data acquisition & validation: workflow running**
 
 | Phase | Status |
 |---|---|
 | 0 Governance | ✅ passed |
-| 1 Strategy freeze | 🟡 corrected; re-audit required |
-| 2 Data acquisition | ⚪ blocked on Phase 1 gate |
+| 1 Strategy freeze | ✅ tester passed |
+| 2 Data acquisition | 🟡 workflow implemented/running |
 | 3 Data validation | ⚪ pending |
 | 4 Engine/cost model | ⚪ pending |
 | 5 Primary backtest | ⚪ pending |
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P1 gate: tester identified and developer corrected a stop-loss-unit ambiguity. No data/backtest promotion until the revised specification passes independent re-audit.
+P1 passed. Phase 2 now acquires and hashes public option + spot sources, validates schemas/invariants, caches data, and publishes manifest/report artifacts. Performance engine remains blocked until data gates pass.
 
 ## Key known limitation
 
