@@ -216,6 +216,11 @@ def main() -> None:
         if pd.isna(row["current_expiry"]) or pd.isna(row["next_expiry"]):
             reasons[d].append("missing_two_weekly_expiries")
             continue
+        if int(row["lot_size_current"]) != int(row["lot_size_next"]):
+            reasons[d].append(
+                f"lot_size_mismatch:{int(row['lot_size_current'])}_vs_{int(row['lot_size_next'])}"
+            )
+            continue
         if pd.isna(row["current_ce_strike"]) or pd.isna(row["next_pe_strike"]):
             reasons[d].append("missing_09:30_entry_strike")
             continue
