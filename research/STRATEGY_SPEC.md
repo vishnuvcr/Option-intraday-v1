@@ -33,7 +33,7 @@
 9. On a trigger, the lower-premium leg is closed and replaced at the next minute bar open by the same option type and same expiry at the strike whose next-bar-open premium is closest to the higher-premium leg's observed premium. Ties are resolved by strike distance to spot and then lower strike.
 10. The other leg is retained.
 11. Multiple adjustments are permitted when the trigger recurs.
-12. Stop-loss is account-level cumulative realized + mark-to-market loss of **100 option-premium points × the lot quantity in force for each leg** relative to the original trade entry credit/debit. The trigger is evaluated from the observed bar close and executed at the next bar open. Stop-loss takes precedence over a simultaneous adjustment trigger.
+12. Stop-loss is **one combined strategy-level maximum loss of 100 option-premium points × the applicable historical NIFTY lot size** for the complete two-leg position. It is computed from the original entry credit/debit plus all realized roll P&L and current mark-to-market across both legs. The trigger is evaluated from the observed bar close and executed at the next bar open. Stop-loss takes precedence over a simultaneous adjustment trigger.
 13. Regular exit is the 15:15 bar open.
 14. If the data end before the required exit, the trade is marked incomplete and excluded from primary performance aggregates rather than forward-filled.
 15. Re-entry after stop-loss is **not enabled in the primary backtest** because the source rule does not define a deterministic re-entry trigger. This is a fidelity safeguard, not an optimization.
