@@ -6,12 +6,12 @@
 
 ## Current phase
 
-**Phase 0 — Governance & reproducibility: initialized**
+**Phase 1 — Strategy freeze: awaiting independent re-audit**
 
 | Phase | Status |
 |---|---|
-| 0 Governance | 🟡 initialized |
-| 1 Strategy freeze | ⚪ pending tester gate |
+| 0 Governance | ✅ passed |
+| 1 Strategy freeze | 🟡 corrected; re-audit required |
 | 2 Data acquisition | ⚪ blocked on Phase 1 gate |
 | 3 Data validation | ⚪ pending |
 | 4 Engine/cost model | ⚪ pending |
@@ -23,7 +23,7 @@
 
 ## Immediate gate
 
-P0/P1: establish isolated developer and tester branches, then independently audit the exact operationalization before coding the performance engine.
+P1 gate: tester identified and developer corrected a stop-loss-unit ambiguity. No data/backtest promotion until the revised specification passes independent re-audit.
 
 ## Key known limitation
 
