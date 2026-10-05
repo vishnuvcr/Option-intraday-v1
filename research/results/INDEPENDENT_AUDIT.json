@@ -1,0 +1,36 @@
+{
+  "checks": {
+    "trade_count": 296,
+    "completed_count": 296,
+    "net_pnl": -54536.786401553414,
+    "gross_pnl": 127063.4,
+    "slippage": 134540.0,
+    "transaction_costs": 47060.186401553394,
+    "win_rate": 0.5540540540540541,
+    "max_drawdown": -80611.36236057553,
+    "stop_loss_trades": 15,
+    "adjustment_trades": 249,
+    "total_adjustments": 428,
+    "execution_rows": 2040,
+    "execution_qty": 134540.0,
+    "execution_cost_sum": 47060.1864015534,
+    "execution_slippage_points_sum": 2040.0,
+    "reconciliation_net": -54536.7864015534
+  },
+  "comparisons": {
+    "trade_count": true,
+    "net_pnl": true,
+    "gross_pnl": true,
+    "slippage": true,
+    "transaction_costs": true,
+    "win_rate": true,
+    "max_drawdown": true,
+    "stop_loss_trades": true,
+    "adjustment_trades": true,
+    "total_adjustments": true,
+    "execution_cost_sum": true,
+    "execution_slippage_qty": true
+  },
+  "all_pass": true,
+  "status": "phase7_audit_complete"
+}
