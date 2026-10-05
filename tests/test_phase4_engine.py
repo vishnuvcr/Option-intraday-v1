@@ -113,4 +113,4 @@ def test_zero_price_sell_is_floored_at_zero():
 def test_realized_roll_is_already_in_option_points():
     legs={"ce":{"raw_entry":60.0},"pe":{"raw_entry":60.0}}
     marks={"ce":100.0,"pe":80.0}
-    assert short_pnl_points(20.0, legs, marks) == -60.0
+    assert short_pnl_points(20.0, legs, marks) == -40.0
