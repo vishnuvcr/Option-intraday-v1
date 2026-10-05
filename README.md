@@ -33,6 +33,19 @@ The full deterministic operationalization is in [research/RESEARCH_PLAN.md](rese
 
 Public/free sources are preferred before paid sources. The planned primary intraday source is a public Hugging Face dataset pinned to an immutable revision; official NSE documents are used for contract/lot-size and levy reconciliation. Paytm Money brokerage, statutory levies, GST, and slippage are modeled separately so gross and net results can be distinguished.
 
+## Final research evidence
+
+- [Final manuscript](research/FINAL_MANUSCRIPT.md)
+- [Supplementary evidence](research/SUPPLEMENTARY_EVIDENCE.md)
+- [Primary statistics](research/results/PRIMARY_STATISTICS.json)
+- [Primary trade ledger](research/results/trade_ledger.csv)
+- [Execution ledger](research/results/execution_ledger.csv)
+- [Robustness results](research/results/ROBUSTNESS_SUMMARY.json)
+- [Forward diagnostic](research/results/OOS_FORWARD_DIAGNOSTIC.json)
+- [Independent audit](research/results/INDEPENDENT_AUDIT.json)
+
+**Primary conclusion:** the strategy is not validated as a robust profitable strategy after realistic execution costs. The later forward slice was slightly positive but was not prospectively sequestered and is therefore only a retrospective diagnostic.
+
 ## Current evidence
 
 - P1 strategy freeze: passed independent tester re-audit.
