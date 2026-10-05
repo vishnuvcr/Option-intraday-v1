@@ -1,0 +1,63 @@
+name: Phase 5 primary backtest
+
+on:
+  push:
+    branches:
+      - developer/phase-5-primary-backtest
+    paths-ignore:
+      - research/results/**
+  workflow_dispatch:
+
+concurrency:
+  group: phase-5-primary-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  primary-backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: |
+            data/cache/hf_options
+            data/cache/spot
+          key: option-intraday-phase5-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
+          restore-keys: |
+            option-intraday-phase4-${{ runner.os }}-
+      - name: Acquire source data on cache miss
+        if: ${{ hashFiles('data/cache/hf_options/upstox_intraday/NIFTY/NIFTY_2024.parquet') == '' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/acquire_data.py
+      - run: pytest -q tests/test_phase4_engine.py
+      - run: python scripts/backtest_engine.py
+      - run: python scripts/analyze_primary.py
+      - name: Commit frozen primary evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/results/PRIMARY_BACKTEST_SUMMARY.json research/results/PRIMARY_STATISTICS.json research/results/PRIMARY_MONTHLY_RESULTS.csv research/results/PRIMARY_EVENT_COUNTS_MONTHLY.csv research/results/primary_equity_curve.png research/results/primary_drawdown.png research/results/primary_pnl_distribution.png research/results/trade_ledger.csv research/results/execution_ledger.csv
+          git commit -m "Phase 5: freeze primary backtest evidence" || echo "No changes to commit"
+          git push
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase-5-primary-evidence
+          path: |
+            research/results/PRIMARY_STATISTICS.json
+            research/results/PRIMARY_MONTHLY_RESULTS.csv
+            research/results/PRIMARY_EVENT_COUNTS_MONTHLY.csv
+            research/results/primary_equity_curve.png
+            research/results/primary_drawdown.png
+            research/results/primary_pnl_distribution.png
+            research/results/trade_ledger.csv
+            research/results/execution_ledger.csv
