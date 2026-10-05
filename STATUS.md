@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 4 — Engine/cost model: developer run passed; tester gate pending****
+**Phase 5 — Primary backtest: starting after P4 tester pass****
 
 | Phase | Status |
 |---|---|
@@ -14,8 +14,8 @@
 | 1 Strategy freeze | ✅ tester passed |
 | 2 Data acquisition | ✅ tester passed |
 | 3 Data validation | ✅ tester passed |
-| 4 Engine/cost model | 🟡 developer run passed; tester review pending |
-| 5 Primary backtest | ⚪ pending — Phase 4 gate not yet passed |
+| 4 Engine/cost model | ✅ tester passed |
+| 5 Primary backtest | 🟡 primary ledger/statistics generation starting |
 | 6 Robustness | ⚪ pending |
 | 7 Independent tester | ⚪ pending |
 | 8 OOS | ⚪ pending |
