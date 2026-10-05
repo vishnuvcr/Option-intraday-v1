@@ -19,7 +19,7 @@
 | 6 Robustness | ✅ tester passed |
 | 7 Independent tester | ✅ reproduction audit passed |
 | 8 OOS | ✅ tester passed with non-prospective qualification |
-| 9 Manuscript | 🟡 manuscript/closure generation starting |
+| 9 Manuscript | ✅ complete |
 
 ## Immediate gate
 
@@ -39,3 +39,8 @@ Public Hugging Face `rissin/nse-options-intraday` currently advertises NIFTY/BAN
 ## Cost candidate
 
 Paytm Money's current public F&O FAQ states ₹10 brokerage per executed F&O order; statutory charges are separate and are applied from current official exchange/regulatory schedules with the historical schedule matched to each test date.
+
+
+## Final conclusion
+
+The locked strategy produced −₹54,536.79 net P&L over 296 completed trades under the primary 1-point slippage model. Research is closed under the predefined Phase 9 stop condition. The complete manuscript is in research/FINAL_MANUSCRIPT.md.
