@@ -4,9 +4,9 @@ Research repository for a reproducible backtest of the **Intraday Asymmetric Pre
 
 ## Research state
 
-**Phase 2 underway — P1 passed; Phase 2 tester block remediated; rerun pending.**
+**Phase 9 complete — tester passed; research closed.**
 
-The study is run as a gated quantitative research program with isolated developer/tester roles. The current locked plan and all status/error logs are version-controlled.
+The study was run as a gated quantitative research program with isolated developer/tester roles. The frozen plan, evidence, tester reports, error log, and research decision log are version-controlled.
 
 ## Canonical documents
 
@@ -16,6 +16,8 @@ The study is run as a gated quantitative research program with isolated develope
 - [Research log](research/logs/RESEARCH_LOG.md)
 - [Error log](research/logs/ERROR_LOG.md)
 - [Conversation decision log](research/logs/CHAT_LOG.md)
+- [Final manuscript](research/FINAL_MANUSCRIPT.md)
+- [Final tester audit](research/tester/GATE_P9_AUDIT.md)
 
 ## Strategy summary
 
@@ -31,7 +33,7 @@ The full deterministic operationalization is in [research/RESEARCH_PLAN.md](rese
 
 ## Data and cost policy
 
-Public/free sources are preferred before paid sources. The planned primary intraday source is a public Hugging Face dataset pinned to an immutable revision; official NSE documents are used for contract/lot-size and levy reconciliation. Paytm Money brokerage, statutory levies, GST, and slippage are modeled separately so gross and net results can be distinguished.
+Public/free sources were preferred before paid sources. The primary intraday source is a pinned public Hugging Face dataset revision; official NSE documents were used for contract/lot-size and levy reconciliation. Paytm Money brokerage, statutory levies, GST, and slippage were modeled separately so gross and net results remain distinguishable.
 
 ## Final research evidence
 
@@ -43,6 +45,7 @@ Public/free sources are preferred before paid sources. The planned primary intra
 - [Robustness results](research/results/ROBUSTNESS_SUMMARY.json)
 - [Forward diagnostic](research/results/OOS_FORWARD_DIAGNOSTIC.json)
 - [Independent audit](research/results/INDEPENDENT_AUDIT.json)
+- [P9 tester audit](research/tester/GATE_P9_AUDIT.md)
 
 **Primary conclusion:** the strategy is not validated as a robust profitable strategy after realistic execution costs. The later forward slice was slightly positive but was not prospectively sequestered and is therefore only a retrospective diagnostic.
 
@@ -51,12 +54,12 @@ Public/free sources are preferred before paid sources. The planned primary intra
 - P0–P9 gates: complete.
 - Primary validated window: 2024-10-01 through 2025-12-31.
 - Primary completed trades: 296.
-- Primary net P&L: −₹54,536.79 under 1-point adverse slippage.
-- Independent tester: passed final manuscript audit.
+- Primary net P&L: **−₹54,536.79** under 1-point adverse slippage.
+- Independent tester: **P9 passed**.
 - Research: **closed** under the predefined Phase 9 stop condition.
 
 ## Research gates
 
 P0 Governance → P1 Exact specification → P2 Data → P3 Validation → P4 Engine → P5 Backtest → P6 Robustness → P7 Independent tester → P8 OOS → P9 Manuscript.
 
-No phase is promoted without the required gate evidence.
+No phase is promoted without the required gate evidence. Any future strategy modification must start as a separately scoped research project with a new frozen specification and independent tester gates.
