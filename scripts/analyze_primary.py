@@ -1,5 +1,6 @@
 from __future__ import annotations
 import json
+import os
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -34,7 +35,7 @@ def main():
     var5=float(np.quantile(x,.05))
     es5=float(x[x<=var5].mean())
     summary=json.loads((R/"primary_backtest_summary.json").read_text())
-    summary["workflow_run_id"]=37252528338
+    summary["workflow_run_id"]=int(os.environ.get("GITHUB_RUN_ID","0"))
     summary["status"]="phase5_primary_run_complete; tester_gate_pending"
     summary.update({
         "bootstrap_mean_net_pnl_ci_95":bootstrap_ci(x),
