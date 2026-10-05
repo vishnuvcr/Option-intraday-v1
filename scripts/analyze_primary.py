@@ -33,7 +33,9 @@ def main():
     sortino=float(dr.mean()/downside*np.sqrt(252)) if downside and downside>0 else None
     var5=float(np.quantile(x,.05))
     es5=float(x[x<=var5].mean())
-    summary=json.loads((R/"PRIMARY_BACKTEST_SUMMARY.json").read_text())
+    summary=json.loads((R/"primary_backtest_summary.json").read_text())
+    summary["workflow_run_id"]=37252528338
+    summary["status"]="phase5_primary_run_complete; tester_gate_pending"
     summary.update({
         "bootstrap_mean_net_pnl_ci_95":bootstrap_ci(x),
         "trade_pnl_skewness":float(skew(x,bias=False)) if len(x)>2 else None,
