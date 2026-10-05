@@ -1,0 +1,19 @@
+{
+  "strategy_id": "intraday_asymmetric_premium_v1",
+  "underlying": "NIFTY",
+  "timezone": "Asia/Kolkata",
+  "entry_time": "09:30:00",
+  "exit_time": "15:15:00",
+  "current_week_leg": {"action":"SELL","option_type":"CE","quantity_lots":1,"expiry_selector":"nearest_weekly_on_or_after_trade_date"},
+  "next_week_leg": {"action":"SELL","option_type":"PE","quantity_lots":1,"expiry_selector":"second_nearest_weekly_on_or_after_trade_date"},
+  "initial_strike_selector":"nearest_underlying_at_entry",
+  "adjustment_ratio_trigger":0.50,
+  "adjustment_target":"higher_premium",
+  "stop_loss_points":100.0,
+  "reentry_enabled":false,
+  "primary_slippage_points_per_execution":1.0,
+  "primary_brokerage_per_executed_order_inr":10.0,
+  "adjustment_observation":"completed_1min_bar_close",
+  "adjustment_execution":"next_1min_bar_open",
+  "regular_exit_execution":"15:15_bar_open"
+}

@@ -1,0 +1,57 @@
+name: Phase 2 data acquisition and validation
+
+on:
+  push:
+    branches:
+      - developer/phase-2-data
+  workflow_dispatch:
+
+concurrency:
+  group: phase-2-data-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  acquire-validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Cache market-data partitions
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/cache/hf_options
+            data/cache/spot
+          key: option-intraday-data-v1-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
+          restore-keys: |
+            option-intraday-data-v1-${{ runner.os }}-
+
+      - name: Acquire public datasets
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/acquire_data.py
+
+      - name: Validate datasets
+        run: python scripts/validate_data.py
+
+      - name: Upload data manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase-2-data-manifest
+          path: |
+            data/cache/acquisition_manifest.json
+            data/cache/validation_report.json

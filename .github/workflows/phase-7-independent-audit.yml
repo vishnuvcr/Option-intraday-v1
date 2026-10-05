@@ -1,0 +1,34 @@
+name: Phase 7 independent audit
+
+on:
+  push:
+    branches:
+      - developer/phase-7-independent-audit
+    paths-ignore:
+      - research/results/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
+      - run: python scripts/independent_audit.py
+      - name: Commit audit evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/results/INDEPENDENT_AUDIT.json
+          git commit -m "Phase 7: freeze independent audit evidence" || echo "No changes"
+          git push
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase-7-independent-audit
+          path: research/results/INDEPENDENT_AUDIT.json

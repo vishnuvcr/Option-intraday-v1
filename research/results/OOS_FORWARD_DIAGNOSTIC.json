@@ -1,0 +1,38 @@
+{
+  "cutoff": "2025-07-01",
+  "development_slice": {
+    "trades": 175,
+    "net_pnl": -56593.455076633996,
+    "gross_pnl": 44996.0,
+    "slippage": 72800.0,
+    "transaction_costs": 28789.455076633996,
+    "mean_pnl": -323.39117186647997,
+    "median_pnl": 285.76540438549995,
+    "win_rate": 0.56,
+    "profit_factor": 0.7720990194453039,
+    "max_drawdown": -74643.92559845801,
+    "stop_loss_trades": 15,
+    "adjustment_trades": 150,
+    "total_adjustments": 258
+  },
+  "forward_slice": {
+    "trades": 121,
+    "net_pnl": 2056.6686750805975,
+    "gross_pnl": 82067.4,
+    "slippage": 61740.0,
+    "transaction_costs": 18270.7313249194,
+    "mean_pnl": 16.997261777525598,
+    "median_pnl": 239.2959321975,
+    "win_rate": 0.5454545454545454,
+    "profit_factor": 1.020516237717385,
+    "max_drawdown": -22849.2789416225,
+    "stop_loss_trades": 0,
+    "adjustment_trades": 99,
+    "total_adjustments": 170
+  },
+  "forward_slice_is_prospective": false,
+  "reason_not_prospective": "The primary backtest was run across the full validated 2024-10-01 to 2025-12-31 sample before this split was formalized; therefore this is a chronological diagnostic, not a prospectively sequestered OOS test.",
+  "parameters_changed": false,
+  "cost_model_unchanged": true,
+  "status": "phase8_forward_diagnostic_complete; tester_gate_pending"
+}

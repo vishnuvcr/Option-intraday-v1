@@ -1,0 +1,44 @@
+{
+  "phase": 2,
+  "primary_window": {
+    "start": "2024-10-01",
+    "end": "2025-12-31"
+  },
+  "options_source": {
+    "repo_id": "rissin/nse-options-intraday",
+    "revision": "78b1c5468255d18cf492984bfe6fe4e3ac874d7c",
+    "files": [
+      {
+        "track": "upstox_2024",
+        "source_path": "upstox_intraday/NIFTY/NIFTY_2024.parquet",
+        "sha256": "573b6fa788dbe06cbb7f6c4a48ee2fcd259434ad05f70a1cca3e775bb5b9d934",
+        "bytes": 140912219,
+        "rows": 14592609
+      },
+      {
+        "track": "upstox_2025",
+        "source_path": "upstox_intraday/NIFTY/NIFTY_2025.parquet",
+        "sha256": "33c2525b57ba442cfabeaebfc63ace63d0292e8f69474d5ea1541b75c9546972",
+        "bytes": 674710222,
+        "rows": 69687860
+      }
+    ]
+  },
+  "spot_source": {
+    "release_url": "https://github.com/voletiramu/nse-fno-1min-data/releases/download/indices-v1.0.0/nifty_indices_5yr.zip",
+    "tag": "indices-v1.0.0",
+    "asset_sha256": "0c1f3de848a4e8c05e233c195685e7ae560d56d08df8baba8b2ffcfac699d3f8",
+    "file": "NIFTY_5min_5yr_2021_2026.csv",
+    "rows": 92876
+  },
+  "validation": {
+    "option_outside_session_ratio": 0.0003196114155463468,
+    "spot_0930_rows": 309,
+    "spot_common_dates": 311,
+    "missing_0930_dates": [
+      "2024-11-01",
+      "2025-10-21"
+    ],
+    "global_duplicate_key_check": "Deferred to Phase 3 contract-level validation"
+  }
+}

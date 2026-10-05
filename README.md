@@ -4,7 +4,7 @@ Research repository for a reproducible backtest of the **Intraday Asymmetric Pre
 
 ## Research state
 
-**Phase 0 initialized — strategy backtest not yet promoted to results.**
+**Phase 2 underway — P1 passed; Phase 2 tester block remediated; rerun pending.**
 
 The study is run as a gated quantitative research program with isolated developer/tester roles. The current locked plan and all status/error logs are version-controlled.
 
@@ -27,11 +27,33 @@ At 09:30 IST:
 5. Exit the complete position at 15:15 IST or earlier on the 100-option-point stop-loss.
 6. Do not carry overnight.
 
-The full deterministic operationalization is in [research/RESEARCH_PLAN.md](research/RESEARCH_PLAN.md).
+The full deterministic operationalization is in [research/RESEARCH_PLAN.md](research/RESEARCH_PLAN.md) and [research/STRATEGY_SPEC.md](research/STRATEGY_SPEC.md).
 
 ## Data and cost policy
 
-Public/free sources are preferred before paid sources. The planned primary intraday source is a public Hugging Face dataset whose card reports 1-minute NIFTY options from October 2024 onward; official NSE documents will be used for contract/lot-size and levy reconciliation. Paytm Money brokerage, statutory levies, GST, and slippage are modeled separately so gross and net results can be distinguished.
+Public/free sources are preferred before paid sources. The planned primary intraday source is a public Hugging Face dataset pinned to an immutable revision; official NSE documents are used for contract/lot-size and levy reconciliation. Paytm Money brokerage, statutory levies, GST, and slippage are modeled separately so gross and net results can be distinguished.
+
+## Final research evidence
+
+- [Final manuscript](research/FINAL_MANUSCRIPT.md)
+- [Supplementary evidence](research/SUPPLEMENTARY_EVIDENCE.md)
+- [Primary statistics](research/results/PRIMARY_STATISTICS.json)
+- [Primary trade ledger](research/results/trade_ledger.csv)
+- [Execution ledger](research/results/execution_ledger.csv)
+- [Robustness results](research/results/ROBUSTNESS_SUMMARY.json)
+- [Forward diagnostic](research/results/OOS_FORWARD_DIAGNOSTIC.json)
+- [Independent audit](research/results/INDEPENDENT_AUDIT.json)
+
+**Primary conclusion:** the strategy is not validated as a robust profitable strategy after realistic execution costs. The later forward slice was slightly positive but was not prospectively sequestered and is therefore only a retrospective diagnostic.
+
+## Final status
+
+- P0–P9 gates: complete.
+- Primary validated window: 2024-10-01 through 2025-12-31.
+- Primary completed trades: 296.
+- Primary net P&L: −₹54,536.79 under 1-point adverse slippage.
+- Independent tester: passed final manuscript audit.
+- Research: **closed** under the predefined Phase 9 stop condition.
 
 ## Research gates
 

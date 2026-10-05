@@ -1,0 +1,14 @@
+{
+  "sample_start": "2024-10-01",
+  "sample_end": "2025-12-31",
+  "brokerage_per_order_inr": 10.0,
+  "exchange_transaction_rate": 0.0003503,
+  "ipft_rate": 0.000005,
+  "exchange_plus_ipft_total_rate": 0.0003553,
+  "sebi_turnover_rate": 0.000001,
+  "stt_option_sale_rate": 0.001,
+  "stamp_duty_option_buy_rate": 0.00003,
+  "gst_rate_on_brokerage_exchange_sebi_ipft": 0.18,
+  "primary_slippage_points_per_leg": 1.0,
+  "slippage_sensitivity_points": [0.0, 0.5, 1.0, 2.0, 3.0, 5.0]
+}

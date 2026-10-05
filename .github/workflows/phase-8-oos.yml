@@ -1,0 +1,36 @@
+name: Phase 8 chronological forward diagnostic
+
+on:
+  push:
+    branches:
+      - developer/phase-8-oos-diagnostic
+    paths-ignore:
+      - research/results/**
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  oos:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pandas
+      - run: python scripts/analyze_oos_forward.py
+      - name: Commit forward-slice evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/results/OOS_FORWARD_DIAGNOSTIC.json research/results/OOS_FORWARD_COST_STRESS.csv
+          git commit -m "Phase 8: freeze chronological forward diagnostic" || echo "No changes"
+          git push
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase-8-forward-diagnostic
+          path: |
+            research/results/OOS_FORWARD_DIAGNOSTIC.json
+            research/results/OOS_FORWARD_COST_STRESS.csv

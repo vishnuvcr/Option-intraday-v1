@@ -1,0 +1,27 @@
+{
+  "sample_trades": 296,
+  "pre_specified_rules": {
+    "slippage_grid_points": [
+      0,
+      0.5,
+      1,
+      2,
+      3
+    ],
+    "transaction_cost_multiplier_grid": [
+      0,
+      0.5,
+      1,
+      1.5,
+      2
+    ],
+    "weekday_stratification": "calendar weekday",
+    "lot_regime": "historical lot size attached to trade",
+    "volatility_regime": "20-trading-day 09:30 spot return realized volatility, split at sample median"
+  },
+  "volatility_median_cut": 0.11127210049856583,
+  "unclassified_volatility_trades": 0,
+  "primary_rule_changed": false,
+  "optimization_performed": false,
+  "status": "phase6_robustness_complete; tester_gate_pending"
+}
