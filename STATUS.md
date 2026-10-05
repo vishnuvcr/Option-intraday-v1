@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 6 — Robustness/stress analysis: starting after P5 tester pass****
+**Phase 8 — Chronological forward-slice/OOS diagnostic: starting after P7 audit pass****
 
 | Phase | Status |
 |---|---|
@@ -16,9 +16,9 @@
 | 3 Data validation | ✅ tester passed |
 | 4 Engine/cost model | ✅ tester passed |
 | 5 Primary backtest | ✅ tester passed |
-| 6 Robustness | 🟡 stress/regime analysis starting |
-| 7 Independent tester | ⚪ pending |
-| 8 OOS | ⚪ pending |
+| 6 Robustness | ✅ tester passed |
+| 7 Independent tester | ✅ reproduction audit passed |
+| 8 OOS | 🟡 chronological forward-slice diagnostic starting |
 | 9 Manuscript | ⚪ pending |
 
 ## Immediate gate
