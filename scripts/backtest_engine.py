@@ -20,6 +20,7 @@ COST_CFG = json.loads((ROOT / "config" / "costs.json").read_text(encoding="utf-8
 START = COST_CFG["sample_start"]
 END = COST_CFG["sample_end"]
 STOP_POINTS = float(STRATEGY_CFG["stop_loss_points"])
+NEAR_ATM_MAX_DISTANCE = 25.0
 SLIPPAGE_POINTS = float(COST_CFG["primary_slippage_points_per_leg"])
 COST = {
     "brokerage_per_order": float(COST_CFG["brokerage_per_order_inr"]),
@@ -243,6 +244,13 @@ def build_universe(con: duckdb.DuckDBPyConnection, spot: pd.DataFrame, option_pa
         if ce_strike is None or pe_strike is None or ce_row.empty or pe_row.empty:
             continue
         row = g.iloc[0]
+        ce_dist = abs(ce_strike - spot0)
+        pe_dist = abs(pe_strike - spot0)
+        # Data-quality guard: NIFTY strikes are 50 points apart in this sample;
+        # a nearest available strike more than half an interval from spot is
+        # not a defensible near-ATM observation and matches Phase 3 exclusions.
+        if ce_dist > NEAR_ATM_MAX_DISTANCE or pe_dist > NEAR_ATM_MAX_DISTANCE:
+            continue
         selected.append(
             {
                 "trade_date": d,
@@ -252,11 +260,13 @@ def build_universe(con: duckdb.DuckDBPyConnection, spot: pd.DataFrame, option_pa
                 "initial_ce_strike": ce_strike,
                 "initial_pe_strike": pe_strike,
                 "lot_size": int(u.loc[u["trade_date"] == d, "lot_current"].iloc[0]),
+                "ce_dist": ce_dist,
+                "pe_dist": pe_dist,
             }
         )
     final = pd.DataFrame(selected).sort_values("trade_date").reset_index(drop=True)
-    if len(final) < 250:
-        raise RuntimeError(f"Phase 4 universe unexpectedly small: {len(final)}")
+    if len(final) != 296:
+        raise RuntimeError(f"Phase 5 universe mismatch: expected 296 after Phase 3 near-ATM exclusions, got {len(final)}")
     final.to_csv(OUT / "phase4_universe.csv", index=False)
     return final
 
