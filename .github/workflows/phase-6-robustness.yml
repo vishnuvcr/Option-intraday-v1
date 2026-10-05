@@ -1,0 +1,59 @@
+name: Phase 6 robustness
+
+on:
+  push:
+    branches:
+      - developer/phase-6-robustness
+    paths-ignore:
+      - research/results/**
+  workflow_dispatch:
+
+concurrency:
+  group: phase-6-robustness-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  robustness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - uses: actions/cache@v4
+        with:
+          path: |
+            data/cache/hf_options
+            data/cache/spot
+          key: option-intraday-phase6-${{ runner.os }}-${{ hashFiles('research/data/SOURCE_MANIFEST.md', 'scripts/acquire_data.py') }}-2026-10-05
+          restore-keys: |
+            option-intraday-phase5-${{ runner.os }}-
+            option-intraday-phase4-${{ runner.os }}-
+      - name: Acquire source data on cache miss
+        if: ${{ hashFiles('data/cache/spot/extracted/NIFTY_5min_5yr_2021_2026.csv') == '' }}
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python scripts/acquire_data.py
+      - run: python scripts/analyze_robustness.py
+      - name: Commit robustness evidence
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add research/results/ROBUSTNESS_*.csv research/results/ROBUSTNESS_SUMMARY.json
+          git commit -m "Phase 6: freeze robustness and stress evidence" || echo "No changes to commit"
+          git push
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase-6-robustness-evidence
+          path: |
+            research/results/ROBUSTNESS_COST_STRESS.csv
+            research/results/ROBUSTNESS_WEEKDAY.csv
+            research/results/ROBUSTNESS_LOT_REGIME.csv
+            research/results/ROBUSTNESS_VOLATILITY_REGIME.csv
+            research/results/ROBUSTNESS_SUMMARY.json
