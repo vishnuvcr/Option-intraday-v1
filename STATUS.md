@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 5 — Primary backtest: starting after P4 tester pass****
+**Phase 6 — Robustness/stress analysis: starting after P5 tester pass****
 
 | Phase | Status |
 |---|---|
@@ -15,8 +15,8 @@
 | 2 Data acquisition | ✅ tester passed |
 | 3 Data validation | ✅ tester passed |
 | 4 Engine/cost model | ✅ tester passed |
-| 5 Primary backtest | 🟡 primary ledger/statistics generation starting |
-| 6 Robustness | ⚪ pending |
+| 5 Primary backtest | ✅ tester passed |
+| 6 Robustness | 🟡 stress/regime analysis starting |
 | 7 Independent tester | ⚪ pending |
 | 8 OOS | ⚪ pending |
 | 9 Manuscript | ⚪ pending |
