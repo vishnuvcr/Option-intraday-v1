@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 8 — Chronological forward-slice/OOS diagnostic: starting after P7 audit pass****
+**Phase 9 — Manuscript and research closure: starting after P8 pass****
 
 | Phase | Status |
 |---|---|
@@ -18,8 +18,8 @@
 | 5 Primary backtest | ✅ tester passed |
 | 6 Robustness | ✅ tester passed |
 | 7 Independent tester | ✅ reproduction audit passed |
-| 8 OOS | 🟡 chronological forward-slice diagnostic starting |
-| 9 Manuscript | ⚪ pending |
+| 8 OOS | ✅ tester passed with non-prospective qualification |
+| 9 Manuscript | 🟡 manuscript/closure generation starting |
 
 ## Immediate gate
 
