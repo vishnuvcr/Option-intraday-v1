@@ -1,0 +1,56 @@
+{
+  "workflow_run_id": 37251240866,
+  "primary_window": {
+    "start": "2024-10-01",
+    "end": "2025-12-31"
+  },
+  "eligible_universe_dates": 301,
+  "completed_trades": 301,
+  "excluded_unexecutable": 0,
+  "total_net_pnl_inr": -113947.60002548288,
+  "total_gross_pnl_raw_inr": 118338.15,
+  "total_slippage_cost_inr": 152390.0,
+  "total_transaction_costs_inr": 79895.75002548288,
+  "mean_net_pnl_inr": -378.5634552341624,
+  "median_net_pnl_inr": 221.771497751,
+  "win_rate": 0.5448504983388704,
+  "profit_factor": 0.7207039793976432,
+  "max_drawdown_inr": -135275.09022231397,
+  "stop_loss_trades": 18,
+  "adjustment_trades": 254,
+  "total_adjustments": 775,
+  "mean_monitoring_gaps_per_trade": 0.0,
+  "slippage_points_per_execution": 1.0,
+  "stop_loss_points": 100.0,
+  "reentry_enabled": false,
+  "margin_context_inr": {
+    "low": 200000,
+    "high": 250000
+  },
+  "cost_model": {
+    "brokerage_per_order": 10.0,
+    "stt_sell_rate": 0.001,
+    "exchange_txn_rate": 0.0003503,
+    "ipft_rate": 5e-06,
+    "sebi_rate": 1e-06,
+    "gst_rate": 0.18,
+    "stamp_buy_rate": 3e-05
+  },
+  "status": "developer_phase4_run_passed; tester_gate_pending",
+  "bootstrap_mean_net_pnl_ci_95": [
+    -867.8517283383633,
+    39.29056667843673
+  ],
+  "trade_pnl_skewness": -5.739412616689997,
+  "trade_pnl_excess_kurtosis": 64.05280721687211,
+  "trade_pnl_var_5pct": -6498.46104734,
+  "trade_pnl_expected_shortfall_5pct": -10802.488228535592,
+  "daily_sharpe_annualized_on_200k": -1.4736368886497797,
+  "daily_sortino_annualized_on_200k": -1.2976598252886284,
+  "return_on_200k": -0.5697380001274144,
+  "return_on_250k": -0.45579040010193156,
+  "average_daily_net_pnl": -378.5634552341624,
+  "daily_net_pnl_std": 4078.011750606877,
+  "worst_trade": -48480.81075108498,
+  "best_trade": 9963.2429928525
+}
