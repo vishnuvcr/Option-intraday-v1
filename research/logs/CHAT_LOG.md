@@ -17,3 +17,5 @@ Relevant locked rules captured from the screenshots:
 - after stop-loss, the reference sheet mentions re-entry only when time/situation permits but does not define a deterministic re-entry rule.
 
 Repository handling: implementation is governed by `RESEARCH_INSTRUCTIONS.md` and `research/RESEARCH_PLAN.md`. Private chain-of-thought is not recorded; only reproducible decision summaries are retained.
+
+| 2026-10-05 | User: Resume / Proceed | Continued gated research from Phase 4 through Phase 9. Completed P4 engine gate, P5 primary backtest, P6 robustness, P7 independent reproduction, P8 chronological forward diagnostic, and P9 manuscript closure. Final primary result: -₹54,536.79 over 296 trades at 1-point slippage. Tester passed all gates. Research closed. |
