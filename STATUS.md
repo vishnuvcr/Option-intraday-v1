@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 4 — Engine/cost model: implementation starting after P3 pass**
+**Phase 4 — Engine/cost model: developer run passed; tester gate pending**ngine/cost model: implementation starting after P3 pass**
 
 | Phase | Status |
 |---|---|
