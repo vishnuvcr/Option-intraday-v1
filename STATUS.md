@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 9 — Manuscript and research closure: starting after P8 pass****
+**Phase 9 — Manuscript and research closure: complete; tester passed****
 
 | Phase | Status |
 |---|---|
