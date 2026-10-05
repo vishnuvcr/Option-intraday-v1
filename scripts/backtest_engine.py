@@ -252,8 +252,6 @@ def build_universe(con: duckdb.DuckDBPyConnection, spot: pd.DataFrame, option_pa
                 "initial_ce_strike": ce_strike,
                 "initial_pe_strike": pe_strike,
                 "lot_size": int(u.loc[u["trade_date"] == d, "lot_current"].iloc[0]),
-                "ce_dist": ce_dist,
-                "pe_dist": pe_dist,
             }
         )
     final = pd.DataFrame(selected).sort_values("trade_date").reset_index(drop=True)
