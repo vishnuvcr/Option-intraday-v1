@@ -46,12 +46,14 @@ Public/free sources are preferred before paid sources. The planned primary intra
 
 **Primary conclusion:** the strategy is not validated as a robust profitable strategy after realistic execution costs. The later forward slice was slightly positive but was not prospectively sequestered and is therefore only a retrospective diagnostic.
 
-## Current evidence
+## Final status
 
-- P1 strategy freeze: passed independent tester re-audit.
-- Phase 2 workflow: [.github/workflows/phase-2-data.yml](.github/workflows/phase-2-data.yml).
-- Selected option source: public Hugging Face 1-minute NIFTY options.
-- Selected spot source: public GitHub release with 5-minute NIFTY spot data through April 2026.
+- P0–P9 gates: complete.
+- Primary validated window: 2024-10-01 through 2025-12-31.
+- Primary completed trades: 296.
+- Primary net P&L: −₹54,536.79 under 1-point adverse slippage.
+- Independent tester: passed final manuscript audit.
+- Research: **closed** under the predefined Phase 9 stop condition.
 
 ## Research gates
 
