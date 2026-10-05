@@ -38,19 +38,19 @@
   },
   "status": "developer_phase4_run_passed; tester_gate_pending",
   "bootstrap_mean_net_pnl_ci_95": [
-    -867.8517283383633,
-    39.29056667843673
+    -522.012171112141,
+    153.3849096788281
   ],
-  "trade_pnl_skewness": -5.739412616689997,
-  "trade_pnl_excess_kurtosis": 64.05280721687211,
-  "trade_pnl_var_5pct": -6498.46104734,
-  "trade_pnl_expected_shortfall_5pct": -10802.488228535592,
-  "daily_sharpe_annualized_on_200k": -1.4736368886497797,
-  "daily_sortino_annualized_on_200k": -1.2976598252886284,
-  "return_on_200k": -0.5697380001274144,
-  "return_on_250k": -0.45579040010193156,
-  "average_daily_net_pnl": -378.5634552341624,
-  "daily_net_pnl_std": 4078.011750606877,
-  "worst_trade": -48480.81075108498,
+  "trade_pnl_skewness": -0.7854068332349426,
+  "trade_pnl_excess_kurtosis": 1.5481623949911008,
+  "trade_pnl_var_5pct": -5919.7586006018755,
+  "trade_pnl_expected_shortfall_5pct": -8290.600060365634,
+  "daily_sharpe_annualized_on_200k": -0.9783732039262036,
+  "daily_sortino_annualized_on_200k": -1.165162962000967,
+  "return_on_200k": -0.2726839320077671,
+  "return_on_250k": -0.21814714560621365,
+  "average_daily_net_pnl": -184.24590000524802,
+  "daily_net_pnl_std": 2989.4655508201904,
+  "worst_trade": -9875.3162219675,
   "best_trade": 9963.2429928525
 }
