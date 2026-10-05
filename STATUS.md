@@ -6,7 +6,7 @@
 
 ## Current phase
 
-**Phase 9 — Manuscript and research closure: complete; tester passed****
+**Phase 9 — Manuscript and research closure: complete; tester passed.**
 
 | Phase | Status |
 |---|---|
@@ -19,28 +19,32 @@
 | 6 Robustness | ✅ tester passed |
 | 7 Independent tester | ✅ reproduction audit passed |
 | 8 OOS | ✅ tester passed with non-prospective qualification |
-| 9 Manuscript | ✅ complete |
+| 9 Manuscript | ✅ complete; tester passed |
 
-## Immediate gate
+## Frozen primary evidence
 
-P1 passed. Independent P2 audit blocked the data gate; developer remediated the listed reproducibility and validation defects. P2 passed. The primary reproducible sample is frozen at 2024-10-01 through 2025-12-31. Phase 3 is validating expiry ordering, historical lot-size regimes, initial contract availability, minute completeness, and global duplicate keys. The first runs exposed a manifest-field mismatch, an over-strict 346-minute completeness gate, and incorrect historical lot-size cutoffs. All three have been remediated. Workflow run 23 passed with 301 eligible trade dates and zero global duplicate-key groups. Independent tester passed P3 with a no-forward-fill condition. Phase 4 is now authorized.
+- Primary window: **2024-10-01 through 2025-12-31**
+- Completed trades: **296**
+- Gross raw P&L: **₹127,063.40**
+- Slippage: **₹134,540.00**
+- Transaction costs: **₹47,060.19**
+- Net P&L: **−₹54,536.79**
+- Win rate: **55.41%**
+- Profit factor: **0.844**
+- Maximum drawdown: **−₹80,611.36**
+- Primary slippage: **1.0 option point per executed contract**
+- Approximate break-even adverse slippage: **0.59 points per executed contract**
 
-## Phase 4 primary evidence
-See `research/results/PRIMARY_BACKTEST_SUMMARY.json` for the frozen aggregate result. The run uses 1.0 option-point adverse slippage per execution, ₹10 brokerage per order, explicit statutory components, no re-entry, no forward-fill, next-bar execution for triggers, and 15:15 regular exit.
+## Scientific qualification
 
-## Key known limitation
+The July–December 2025 chronological forward slice was **+₹2,056.67** at 1-point slippage, but the split was formalized after the full-sample primary analysis. It is therefore a retrospective diagnostic, **not prospective out-of-sample validation**.
 
-The user-provided rule says “re-entry if time and situation permits” but does not define a deterministic re-entry condition. The primary backtest will therefore not invent one. This is a specification limitation, not a model optimization.
+The primary conclusion is that the locked strategy is **not validated as a robust profitable strategy after realistic execution costs**.
 
-## Data candidate
+## Closure
 
-Public Hugging Face `rissin/nse-options-intraday` currently advertises NIFTY/BANKNIFTY/SENSEX 1-minute intraday coverage from October 2024 onward. Source provenance and license terms must be checked in Phase 2 before results are promoted.
+P0–P9 are complete. The final manuscript, supplementary evidence, ledgers, robustness results, forward diagnostic, independent audit, and P9 tester report are committed to the repository.
 
-## Cost candidate
+Research is **closed under the predefined Phase 9 stop condition**. No parameter search or strategy modification should be performed inside this study.
 
-Paytm Money's current public F&O FAQ states ₹10 brokerage per executed F&O order; statutory charges are separate and are applied from current official exchange/regulatory schedules with the historical schedule matched to each test date.
-
-
-## Final conclusion
-
-The locked strategy produced −₹54,536.79 net P&L over 296 completed trades under the primary 1-point slippage model. Research is closed under the predefined Phase 9 stop condition. The complete manuscript is in research/FINAL_MANUSCRIPT.md.
+Any future strategy modification must begin as a separately scoped research project with a new frozen specification, independent developer/tester branches, and fresh gates.
