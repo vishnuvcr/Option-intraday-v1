@@ -56,3 +56,12 @@ This is an engine gate, not a final strategy-performance conclusion. No optimiza
 ## Instructions to developer
 
 Proceed to Phase 5 only: freeze the primary ledgers, independently reconcile trade-level P&L/costs, produce primary statistical tables and equity/drawdown charts, document exclusions, and prepare the Phase 5 tester gate. Do not tune strategy parameters or begin robustness optimization before P5 passes.
+
+
+## Addendum — P4 gate reopened after Phase 5 trace audit
+
+A subsequent independent trace of the frozen Phase 3 exclusions found that five documented near-ATM source-gap dates were admitted by the first Phase 4/5 engine version. The clearest manifestation was 2024-12-19: the selected next-week PE was 3,100 points from spot and the engine generated 343 adjustments and a -₹48,480.81 trade. This is not a valid representation of the locked “near-ATM” rule and is a data-quality failure.
+
+**Revised tester decision: P4 = BLOCKED pending rerun.** The developer restored the Phase 3 near-ATM data-quality exclusion (25 points, half the 50-point strike interval) and must rerun the primary engine. No performance result from the 301-trade run is valid as the primary result.
+
+**Instructions to developer:** rerun Phase 5 with the restored exclusion; freeze the resulting 296-date ledger only after the workflow passes; then resubmit for tester review. Do not use the superseded 301-trade result in the manuscript.
